@@ -172,8 +172,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 
 /* Bottom nav */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:8px 10px calc(var(--safe-area-inset-bottom,env(safe-area-inset-bottom)) + 8px);background:rgba(12,10,11,.92);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
-.nav .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-.nav button{display:grid;justify-items:center;gap:3px;padding:6px 0;color:var(--dim);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.nav .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.nav button{display:grid;justify-items:center;gap:3px;padding:6px 0;color:var(--dim);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .nav button svg{width:24px;height:24px}
 .nav button.on{color:var(--chalk)}
 .nav button.on svg{color:var(--red)}
@@ -277,6 +277,9 @@ h1,h2,h3{margin:0;text-wrap:balance}
 <canvas id="confetti" hidden></canvas>
 <svg id="measure" width="0" height="0" style="position:absolute" aria-hidden="true"><path id="mpath" d=""/></svg>
 <script src="data.js"></script>
+<script src="vendor/firebase.js"></script>
+<script src="firebase-config.js"></script>
+<script src="team.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

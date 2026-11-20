@@ -8,7 +8,7 @@ const DEFAULT={v:2,name:'',num:'',start:'2026-11-23',sound:true,voice:true,buzz:
   sport:'',age:0,exp:'some',growth:false,parentOk:false,
   rest:{round:60,trans:15,hill:60,skip:30},
   slots:{},adj:{},log:{},stats:{sets:0,sprints:0,cond:0,skills:0,swaps:0},sunMode:{},seenMedals:[],onboarded:false,
-  season:{on:false,start:'',weeks:18,train:[1,3],game:5,trainMin:90,gameMin:60},ilog:{}};
+  season:{on:false,start:'',weeks:18,train:[1,3],game:5,trainMin:90,gameMin:60},ilog:{},team:null};
 let S=load();
 function load(){
   try{const raw=localStorage.getItem(KEY);if(raw){return migrate(JSON.parse(raw));}}catch(e){}
@@ -454,6 +454,7 @@ const IC={
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><ellipse cx="12" cy="12" rx="8" ry="10"/><path d="M12 2v20M4.5 8h15M4.5 16h15" opacity=".45"/></svg>',
   drills:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg>',
   medals:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 2l2 6M16 2l-2 6"/><circle cx="12" cy="15" r="6"/></svg>',
+  team:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.6c.6-.2 1.3-.3 2-.3 2.5 0 4.5 2 4.5 4.5"/></svg>',
   locker:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 21V8a6 6 0 0112 0v13M6 21h12M10 12h4"/></svg>',
   play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>',
   pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>',
@@ -479,10 +480,11 @@ function render(){
   if(detail)html+=(detail.startsWith('i:')?detailIn(+detail.slice(2)):detailView(detail));
   else if(tab==='home')html+=board(D)+(inSeason()?homeIn(D):homeView(D));
   else if(tab==='drills')html+=drillsView();
+  else if(tab==='team')html+=window.TeamUI.view();
   else if(tab==='medals')html+=medalsView(D);
   else html+=lockerView();
   html+='</div>';
-  if(!detail)html+=navBar();
+  if(!detail&&!(tab==='team'&&window.TeamUI.inDetail()))html+=navBar();
   root.innerHTML=html;
   if(!sheetOpen){if(!S.onboarded||!S.sport)openOnboard();else if(!S.age)openAbout(true);}
 }
@@ -614,7 +616,7 @@ function openSeasonSetup(){
 }
 function navBar(){
   const b=(id,l)=>`<button class="${tab===id?'on':''}" data-tab="${id}">${IC[id]}<span>${l}</span></button>`;
-  return `<nav class="nav"><div class="in">${b('home',inSeason()?'Weeks':plural(T().week))}${b('drills','Drills')}${b('medals','Medals')}${b('locker','Locker')}</div></nav>`;
+  return `<nav class="nav"><div class="in">${b('home',inSeason()?'Weeks':plural(T().week))}${b('drills','Drills')}${b('team','Team')}${b('medals','Medals')}${b('locker','Locker')}</div></nav>`;
 }
 function slotRow(slot,w){
   const k=exOf(slot),e=EX[k],a=amountFor(slot,w),L=amtLabel(e,a);
@@ -796,6 +798,7 @@ function toast(t){const o=document.querySelector('.toast');if(o)o.remove();const
 root.addEventListener('click',e=>{
   const t=e.target.closest('button');if(!t)return;
   const d=t.dataset;
+  if(d.t){window.TeamUI.click(t);return;}
   if(d.tab){tab=d.tab;detail=null;render();scrollTo(0,0);}
   else if(d.open){detail=d.open;render();scrollTo(0,0);}
   else if(d.iopen!=null){detail='i:'+d.iopen;render();scrollTo(0,0);}
@@ -1032,6 +1035,7 @@ NP.App.addListener('appStateChange',st=>{if(st.isActive){cancelNotifs();if(P)tic
 window.__app={buildSession,flatSteps,estMin,derived,amountFor,exOf,S:()=>S,setState:o=>{S=migrate(clone(o));save();viewWeek=currentWeek();closeSheet();render();},phaseOf,setWeek:w=>{viewWeek=w;render();},
   startPlayer,fieldSVG,planWeek,sessIn,derivedIn,openSeasonSetup,setIWeek:w=>{viewIWeek=w;render();},tab:x=>{tab=x;detail=null;render();},open:d=>{detail=d;render();}};
 
+window.__core={S:()=>S,save,render:()=>render(),toast,sheet,closeSheet,confirm:confirmSheet,esc,ballIcon,IC,tab:()=>tab};
 if(inSeason())viewIWeek=seasonWeek();
 render();
 })();

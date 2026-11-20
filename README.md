@@ -38,3 +38,11 @@ The same project can be built for iPhone with `npx cap add ios` on a Mac with Xc
 
 ## Safety note
 The app gives general training guidance for healthy young athletes, based on the NSCA youth resistance training position statement and the 2014 International Consensus on youth resistance training. It isn't medical advice. Kids should train with an adult around and see a doctor or physio about any injury or health condition.
+
+## Teams
+A coach creates a team in the **Team** tab and shares the 6-letter code. Players join and the coach approves them. The coach posts team sessions (a 3 km run, a beep test, max push-ups or just "done"). Players log their result **with the team** or **on their own** before the due date, and everyone sees a live results board. Teams only see first names and jumper numbers. There are no photos or chat, and sign-in is anonymous.
+
+Teams use Firebase (free Spark plan): Anonymous Authentication and Cloud Firestore.
+- `www/firebase-config.js` holds the web app config. When it's `null`, team features are switched off.
+- `firestore.rules` holds the security rules. Paste them into Firestore > Rules in the Firebase console.
+- `www/vendor/firebase.js` is the Firebase JS SDK (v13) bundled with esbuild so the app works without a CDN.
