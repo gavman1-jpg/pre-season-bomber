@@ -117,8 +117,10 @@ function backend(){
   return B;
 }
 function rerender(){if(C().tab()==='team'&&!document.getElementById('player'))C().render();}
-function friendly(e){
+function friendly(e){return friendlyMsg(e)+((e&&e.code)?' ('+e.code+')':'');}
+function friendlyMsg(e){
   const m=(e&&(e.code||e.message))||'';
+  if(/admin-restricted|operation-not-allowed/.test(m))return 'Team sign-in isn\'t switched on yet (Anonymous sign-in in Firebase).';
   if(/nocode/.test(m))return 'That code didn\'t match a team. Check it with your coach.';
   if(/network|unavailable|offline/i.test(m))return 'No internet connection. Team results need you to be online.';
   if(/permission/i.test(m))return 'You don\'t have access to that yet. Your coach may need to approve you.';
