@@ -1,0 +1,9 @@
+{
+  "appId": "au.com.preseasonbomber.app",
+  "appName": "Pre-Season Bomber",
+  "webDir": "www",
+  "android": { "backgroundColor": "#0c0a0b" },
+  "plugins": {
+    "LocalNotifications": { "smallIcon": "ic_stat_ball", "iconColor": "#E3122F" }
+  }
+}
