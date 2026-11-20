@@ -18,7 +18,7 @@
 @font-face{font-family:"Barlow";font-weight:600;font-display:swap;src:url(fonts/barlow-latin-600-normal.woff2) format("woff2")}
 @font-face{font-family:"Barlow";font-weight:700;font-display:swap;src:url(fonts/barlow-latin-700-normal.woff2) format("woff2")}
 
-/* Night game under lights: black ground, footy red, line-marking chalk. The timer is an oval. */
+/* Night game under lights: black ground, the sport's colour, line-marking chalk. The timer is the sport's field. */
 :root{
   --night:#0c0a0b;
   --stand:#171314;
@@ -29,6 +29,10 @@
   --dim:#a79c9e;
   --turf:#31c374;
   --gold:#f3b53f;
+  --abyss:#4a0610;
+  --on:#ffffff;
+  --hero1:var(--red);
+  --rest:#31c374;
   --line:rgba(244,239,230,.10);
   --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   --body:"Barlow","Segoe UI",Roboto,system-ui,sans-serif;
@@ -80,8 +84,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 
 /* Hero next-up card */
 .hero{position:relative;overflow:hidden;border-radius:24px;padding:20px 18px 18px;
-  background:linear-gradient(150deg,var(--red) 0%,var(--red-deep) 58%,#4a0610 100%);
-  box-shadow:0 18px 40px rgba(227,18,47,.28)}
+  background:linear-gradient(150deg,var(--hero1) 0%,var(--red-deep) 58%,var(--abyss) 100%);color:#fff;
+  box-shadow:0 18px 40px color-mix(in srgb,var(--red) 28%,transparent)}
 .hero::after{content:"";position:absolute;right:-70px;top:-40px;width:260px;height:340px;border:3px solid rgba(255,255,255,.16);border-radius:50%;transform:rotate(-18deg)}
 .hero::before{content:"";position:absolute;right:20px;top:46px;width:120px;height:160px;border:3px solid rgba(255,255,255,.10);border-radius:50%;transform:rotate(-18deg)}
 .hero .tag{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
@@ -155,11 +159,12 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .dhead p{margin:6px 0 0;color:var(--dim)}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--stand);border:1px solid var(--line);border-radius:14px;padding:4px;margin-top:14px}
 .seg button{padding:10px;border-radius:10px;font-family:var(--display);font-size:20px;font-weight:800;text-transform:uppercase;color:var(--dim)}
-.seg button.on{background:var(--red);color:#fff}
+.seg button.on{background:var(--red);color:var(--on)}
+.seg.three{grid-template-columns:1fr 1fr 1fr}
 .sticky{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(var(--safe-area-inset-bottom,env(safe-area-inset-bottom)) + 12px);
   background:linear-gradient(180deg,transparent,var(--night) 30%);z-index:5}
 .sticky .in{max-width:520px;margin:0 auto;display:grid;gap:8px}
-.big{width:100%;border-radius:16px;padding:16px;background:var(--red);color:#fff;font-family:var(--display);font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 6px 0 var(--red-deep)}
+.big{width:100%;border-radius:16px;padding:16px;background:var(--red);color:var(--on);font-family:var(--display);font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 6px 0 var(--red-deep)}
 .big:active{transform:translateY(3px);box-shadow:0 3px 0 var(--red-deep)}
 .link{font-weight:700;color:var(--dim);padding:6px;font-size:14px;text-decoration:underline;text-underline-offset:3px}
 .tip{display:flex;gap:10px;align-items:flex-start;background:rgba(243,181,63,.08);border:1px solid rgba(243,181,63,.22);border-radius:14px;padding:12px;margin-top:14px;font-size:14.5px}
@@ -202,8 +207,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 /* Player */
 .player{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;overflow:hidden;background:var(--night);
   padding:calc(var(--safe-area-inset-top,env(safe-area-inset-top)) + 10px) 16px calc(var(--safe-area-inset-bottom,env(safe-area-inset-bottom)) + 16px);transition:background .35s}
-.player.work{background:radial-gradient(90% 60% at 50% 40%, rgba(227,18,47,.28), transparent 70%),var(--night)}
-.player.rest{background:radial-gradient(90% 60% at 50% 40%, rgba(49,195,116,.18), transparent 70%),var(--night)}
+.player.work{background:radial-gradient(90% 60% at 50% 40%, color-mix(in srgb,var(--red) 28%,transparent), transparent 70%),var(--night)}
+.player.rest{background:radial-gradient(90% 60% at 50% 40%, color-mix(in srgb,var(--rest) 20%,transparent), transparent 70%),var(--night)}
 .player.ready{background:radial-gradient(90% 60% at 50% 40%, rgba(243,181,63,.18), transparent 70%),var(--night)}
 .ptop{display:flex;justify-content:space-between;align-items:center;max-width:520px;width:100%;margin:0 auto}
 .ptop .x{width:42px;height:42px;border-radius:12px;background:var(--stand);font-size:22px;display:grid;place-items:center}
@@ -232,8 +237,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .pctl .main svg{width:26px;height:26px}
 
 /* Finish */
-.fin{position:fixed;inset:0;z-index:40;background:radial-gradient(100% 70% at 50% 30%, rgba(227,18,47,.35), var(--night) 72%);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px}
-.fin .goal{font-family:var(--display);font-weight:900;font-size:min(26vw,150px);line-height:.85;text-transform:uppercase;color:var(--chalk);animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+.fin{position:fixed;inset:0;z-index:40;background:radial-gradient(100% 70% at 50% 30%, color-mix(in srgb,var(--red) 35%,transparent), var(--night) 72%);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px}
+.fin .goal{font-family:var(--display);font-weight:900;font-size:min(22vw,130px);line-height:.85;text-transform:uppercase;color:var(--chalk);animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
 .fin .sub{font-family:var(--display);font-size:28px;font-weight:800;text-transform:uppercase;color:var(--red);margin-top:8px}
 .fin p{color:var(--dim);max-width:30ch}
 .fin .newm{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0}
@@ -245,710 +250,30 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .toast{position:fixed;left:50%;bottom:calc(var(--safe-area-inset-bottom,env(safe-area-inset-bottom)) + 92px);transform:translateX(-50%);background:var(--chalk);color:#140f10;font-weight:700;padding:10px 16px;border-radius:999px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:up .2s;white-space:nowrap}
 .enter{animation:fade .25s}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Sport picker */
+.sports{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.sp{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;text-align:left;padding:10px;border-radius:14px;background:var(--stand);border:1px solid var(--line)}
+.sp.cur{border-color:var(--red);box-shadow:0 0 0 1px var(--red) inset}
+.sp .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
+.sp b{display:block;font-family:var(--display);font-size:19px;font-weight:800;text-transform:uppercase;line-height:1}
+.sp small{display:block;color:var(--dim);font-size:11.5px;line-height:1.2;margin-top:3px}
+.check{display:flex;gap:10px;align-items:flex-start;padding:12px 0;font-size:14.5px;color:var(--chalk)}
+.check input{width:22px;height:22px;accent-color:var(--red);flex:none;margin-top:1px}
+.hint{font-size:13px;color:var(--dim);margin-top:2px}
+.ready{width:100%;text-align:left;display:grid;gap:2px;padding:14px;border-radius:14px;background:var(--stand);border:1px solid var(--line);margin-bottom:8px}
+.ready b{font-size:17px}.ready small{color:var(--dim);font-size:13.5px}
+.ready.ok{border-color:rgba(49,195,116,.45)}.ready.lite{border-color:rgba(243,181,63,.45)}.ready.stop{border-color:rgba(255,90,90,.45)}
+.safe .simple{display:block}.safe .simple b{display:block;color:var(--chalk);margin-bottom:2px}.safe .simple span{color:var(--dim)!important;white-space:normal!important;font-weight:500!important}
+.band{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:13px;color:var(--dim);font-weight:600}
+.band b{color:var(--gold);text-transform:uppercase;letter-spacing:.06em}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <canvas id="confetti" hidden></canvas>
-<script>
-(function(){
-"use strict";
-
-/* ---------------- Exercise library ---------------- */
-const EX = {
-  squat:{n:'Squats',t:'reps',a:12,cat:'legs',cue:'Feet shoulder-width, chest up, sit back to knee height.',why:'Strong legs mean longer kicks.'},
-  jumpsquat:{n:'Squat jumps',t:'reps',a:8,cat:'legs',cue:'Squat down, explode up, land soft and quiet.',why:'Spring for marking contests.'},
-  splitsquat:{n:'Split squats',t:'reps',a:8,each:'leg',cat:'legs',cue:'Long stance, drop the back knee straight down.',why:'Single-leg strength for kicking.'},
-  wallsit:{n:'Wall sit',t:'time',a:30,cat:'legs',cue:'Back flat on the wall, thighs level with the ground.',why:'Legs that last four quarters.'},
-  stepup:{n:'Step-ups',t:'reps',a:8,each:'leg',cat:'legs',cue:'Whole foot on the step, drive up through the heel.',why:'Power for leaping at the ball.'},
-
-  pushup:{n:'Push-ups',t:'reps',a:10,cat:'push',cue:'Body straight as a plank, chest to a fist off the ground. Knees down is fine.',why:'Upper body to fend off tackles.'},
-  inclinepush:{n:'Incline push-ups',t:'reps',a:12,cat:'push',cue:'Hands on a bench or step, body straight.',why:'Easier push-up, same muscles.'},
-  widepush:{n:'Wide push-ups',t:'reps',a:10,cat:'push',cue:'Hands wider than shoulders, lower slowly.',why:'Chest strength for bumps.'},
-  taps:{n:'Plank shoulder taps',t:'time',a:30,cat:'push',cue:'High plank, tap opposite shoulder, hips still.',why:'Strong shoulders and core together.'},
-  dips:{n:'Bench dips',t:'reps',a:10,cat:'push',cue:'Hands on a bench behind you, elbows point back.',why:'Arms for handballs and fends.'},
-
-  revlunge:{n:'Reverse lunges',t:'reps',a:8,each:'leg',cat:'lunge',cue:'Step back, both knees to 90°, push through the front heel.',why:'Balance and leg drive.'},
-  walklunge:{n:'Walking lunges',t:'reps',a:10,each:'leg',cat:'lunge',cue:'Big steps forward, chest tall.',why:'Stride power for leading.'},
-  latlunge:{n:'Side lunges',t:'reps',a:8,each:'side',cat:'lunge',cue:'Step wide, sit into one hip, other leg straight.',why:'Change of direction.'},
-  curtsy:{n:'Curtsy lunges',t:'reps',a:8,each:'leg',cat:'lunge',cue:'Step back and across, like a curtsy.',why:'Hip strength for sidesteps.'},
-
-  row:{n:'Inverted rows',t:'reps',a:8,cat:'pull',cue:'Under a low park bar, body straight, pull your chest to the bar.',why:'Back strength for tackling.'},
-  chinneg:{n:'Chin-up negatives',t:'reps',a:4,cat:'pull',cue:'Jump to the top, lower yourself slowly over 3–5 seconds.',why:'Grip and pulling power.'},
-  bagrow:{n:'Backpack rows',t:'reps',a:12,cat:'pull',cue:'Hinge forward, pull a loaded backpack to your belly.',why:'Back strength, anywhere.'},
-  superman:{n:'Superman pulls',t:'reps',a:12,cat:'pull',cue:'Lie face down, lift chest, pull elbows back.',why:'Posture and upper back.'},
-
-  bridge:{n:'Glute bridges',t:'reps',a:12,cat:'hips',cue:'Feet flat, squeeze your bum, lift hips high.',why:'Glutes power every sprint.'},
-  slbridge:{n:'Single-leg bridges',t:'reps',a:8,each:'leg',cat:'hips',cue:'One foot down, other leg straight, hips level.',why:'Protects hamstrings.'},
-  hipthrust:{n:'Bench hip thrusts',t:'reps',a:12,cat:'hips',cue:'Shoulders on a bench, drive hips to the sky.',why:'Top-speed engine.'},
-
-  plank:{n:'Plank',t:'time',a:30,cat:'core',cue:'Forearms down, straight line from head to heels.',why:'Strong core in contests.'},
-  sideplank:{n:'Side plank',t:'time',a:20,each:'side',cat:'core',cue:'Elbow under shoulder, hips high.',why:'Stay upright in tackles.'},
-  deadbug:{n:'Dead bugs',t:'reps',a:10,each:'side',cat:'core',cue:'Back pressed flat, opposite arm and leg reach out slowly.',why:'Core control when kicking.'},
-  climbers:{n:'Mountain climbers',t:'time',a:30,cat:'core',cue:'High plank, drive knees to chest fast.',why:'Core plus fitness.'},
-  hollow:{n:'Hollow hold',t:'time',a:20,cat:'core',cue:'Lower back down, arms and legs off the ground.',why:'Gymnast-strong core.'},
-  birddog:{n:'Bird dogs',t:'reps',a:8,each:'side',cat:'core',cue:'On all fours, reach opposite arm and leg, hold 2 sec.',why:'Balance and back health.'},
-
-  broad:{n:'Broad jumps',t:'reps',a:5,cat:'power',cue:'Swing your arms, jump forward, stick the landing for 2 sec.',why:'Explosive first step.'},
-  tuck:{n:'Tuck jumps',t:'reps',a:6,cat:'power',cue:'Jump and pull knees to chest, land soft.',why:'Leap for the big mark.'},
-  skater:{n:'Skater bounds',t:'reps',a:6,each:'side',cat:'power',cue:'Bound sideways off one leg, land and hold on the other.',why:'Sidestep power.'},
-  hops:{n:'Pogo hops',t:'time',a:20,cat:'power',cue:'Small fast bounces, stiff ankles.',why:'Springy feet for speed.'},
-
-  skipbasic:{n:'Two-foot bounce',t:'skip',cat:'skip',cue:'Small bounces, wrists turn the rope.',why:'Light feet, fit lungs.'},
-  skipalt:{n:'Running step',t:'skip',cat:'skip',cue:'Alternate feet like jogging on the spot.',why:'Footwork for the contest.'},
-  skiphk:{n:'High-knee skips',t:'skip',cat:'skip',cue:'Drive knees up each turn.',why:'Sprint mechanics.'},
-  skipside:{n:'Side-to-side',t:'skip',cat:'skip',cue:'Hop side to side over a line.',why:'Agility for dodging.'},
-  skipboxer:{n:'Boxer shuffle',t:'skip',cat:'skip',cue:'Shift weight foot to foot, stay relaxed.',why:'Rhythm and stamina.'}
-};
-const CAT = {legs:'Legs',push:'Push',lunge:'Lunges',pull:'Pull',hips:'Hips',core:'Core',power:'Jumps',skip:'Skipping style'};
-
-/* Slots (the exercises he can swap) */
-const SLOTS = {
-  'sat-legs':{d:'squat',label:'Saturday circuit'},
-  'sat-push':{d:'pushup',label:'Saturday circuit'},
-  'sat-lunge':{d:'revlunge',label:'Saturday circuit'},
-  'sat-pull':{d:'row',label:'Saturday circuit'},
-  'sat-hips':{d:'bridge',label:'Saturday circuit'},
-  'sat-core1':{d:'plank',label:'Saturday circuit'},
-  'sat-core2':{d:'sideplank',label:'Saturday circuit'},
-  'sat-power':{d:'broad',label:'Saturday circuit'},
-  'sun-skip':{d:'skipbasic',label:'Sunday skipping'},
-  'wed-skip':{d:'skipalt',label:'Wednesday skipping'},
-  'wed-core1':{d:'plank',label:'Wednesday core'},
-  'wed-core2':{d:'deadbug',label:'Wednesday core'},
-  'wed-core3':{d:'climbers',label:'Wednesday core'}
-};
-const SAT_SLOTS=['sat-legs','sat-push','sat-lunge','sat-pull','sat-hips','sat-core1','sat-core2','sat-power'];
-const WED_CORE=['wed-core1','wed-core2','wed-core3'];
-
-const PHASES=[
-  {name:'Foundations',weeks:'Wk 1–2',note:'Nail the technique.'},
-  {name:'Build',weeks:'Wk 3–5',note:'More reps, 3 rounds.'},
-  {name:'Match Fit',weeks:'Wk 6–8',note:'Lower slowly, finish strong.'}
-];
-const phaseOf=w=>w<=2?0:(w<=5?1:2);
-
-const LEVELS=[[0,'Rookie'],[12,'Development List'],[30,'Senior List'],[48,'Best 22'],[70,'Vice-Captain'],[92,'Captain'],[112,'Club Legend']];
-
-const MEDALS=[
-  {id:'first',n:'First Bounce',d:'Finish your first session',m:'1',ok:s=>s.sessions>=1},
-  {id:'mixer',n:'Mixed It Up',d:'Swap an exercise',m:'⇄',ok:s=>s.swaps>=1},
-  {id:'hills',n:'Hill Hero',d:'Run 40 hill sprints',m:'40',ok:s=>s.hills>=40},
-  {id:'rope',n:'Rope Master',d:'Smash 50 skipping rounds',m:'50',ok:s=>s.skips>=50},
-  {id:'iron',n:'Iron Body',d:'Complete 100 circuit sets',m:'100',ok:s=>s.sets>=100},
-  {id:'full',n:'Full Week',d:'Mon, Wed, Sat and Sun in one round',m:'4',ok:s=>s.fullWeek},
-  {id:'run',n:'Winning Run',d:'Win 3 rounds in a row',m:'3W',ok:s=>s.bestRun>=3},
-  {id:'half',n:'Halfway',d:'Win round 4',m:'4',ok:s=>s.won4},
-  {id:'flag',n:'Premiers',d:'Win all 8 rounds',m:'8',ok:s=>s.wins>=8}
-];
-
-/* ---------------- State ---------------- */
-const KEY='rb-preseason-v1';
-const DEFAULT={name:'',num:'',start:'2026-11-23',sound:true,voice:true,buzz:true,
-  rest:{round:60,trans:15,hill:60,skip:30},
-  slots:{},adj:{},log:{},stats:{sets:0,hills:0,skips:0,swaps:0},sunMode:{},seenMedals:[],onboarded:false};
-let S=load();
-function load(){
-  try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);return deepMerge(JSON.parse(JSON.stringify(DEFAULT)),o);}}catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULT));
-}
-function deepMerge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k]&&typeof a[k]==='object')deepMerge(a[k],b[k]);else a[k]=b[k];}return a;}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-
-/* ---------------- Dates ---------------- */
-function parseD(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
-function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
-const DOFF={mon:0,wed:2,sat:5,sun:6};
-function dayDate(w,day){return addDays(parseD(S.start),(w-1)*7+DOFF[day]);}
-function fmt(d){return d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});}
-function currentWeek(){const t=new Date();t.setHours(0,0,0,0);const diff=Math.floor((t-parseD(S.start))/864e5);return Math.min(8,Math.max(1,Math.floor(diff/7)+1));}
-let viewWeek=currentWeek();
-
-/* ---------------- Program logic ---------------- */
-function exOf(slot){return EX[S.slots[slot]]?S.slots[slot]:SLOTS[slot].d;}
-function amountFor(slot,w){
-  const k=exOf(slot),e=EX[k];if(e.t==='skip')return null;
-  const p=phaseOf(w);
-  const bump=p===0?0:(e.t==='time'?10:(e.cat==='power'||k==='chinneg'?1:2));
-  const adj=(S.adj[slot]||0);
-  return Math.max(e.t==='time'?10:1,e.a+bump+adj);
-}
-function amtLabel(e,a){
-  if(e.t==='time')return {v:a,u:e.each?'sec each':'sec'};
-  return {v:a,u:e.each?('each '+e.each):'reps'};
-}
-function sunMode(w){return S.sunMode[w]||(w%2===1?'swim':'ride');}
-
-function buildSession(day,w){
-  const p=phaseOf(w),R=S.rest,blocks=[];
-  const W=(name,dur,cue,extra)=>Object.assign({k:'work',name,dur,cue:cue||''},extra||{});
-  const Rs=(name,dur,cue,extra)=>Object.assign({k:'rest',name,dur,cue:cue||''},extra||{});
-  const exSteps=(slot,arr,extra)=>{
-    const k=exOf(slot),e=EX[k],a=amountFor(slot,w);
-    const cue=e.cue+(p===2&&e.t==='reps'&&e.cat!=='power'?' Lower slowly: 3 seconds down.':'');
-    if(e.t==='time'){
-      if(e.each){arr.push(W(e.n+' · left',a,cue,extra));arr.push(Rs('Switch sides',5,'Swap to the other side.'));arr.push(W(e.n+' · right',a,cue,extra));}
-      else arr.push(W(e.n,a,cue,extra));
-    } else arr.push(Object.assign({k:'reps',name:e.n,reps:a,unit:e.each?('each '+e.each):'reps',cue},extra||{}));
-  };
-  if(day==='sat'){
-    const wu=[W('Easy jog',180,'Nice and easy. Loosen up.'),W('Leg swings',60,'10 front-to-back and 10 side-to-side each leg.'),
-      W('Walking lunges',60,'Long steps, chest tall.'),W('Hip openers + arm circles',60,'Open the gate both ways, then big arm circles.')];
-    for(let i=1;i<=3;i++){wu.push(W('Build-up stride '+i+'/3',20,'Start at jog pace, finish at 80%.'));if(i<3)wu.push(Rs('Walk back',40,'Easy walk back to the start.'));}
-    blocks.push({name:'Warm-up',steps:wu});
-    const n=[6,8,8][p],d=[15,20,20][p],hs=[Rs('Head to the hill',60,'Find a hill you can sprint up for 15–20 seconds.')];
-    for(let i=1;i<=n;i++){hs.push(W('Hill sprint '+i+'/'+n,d,'Drive your arms, lean into the hill, quick feet.',{count:'hill'}));if(i<n||p===2)hs.push(Rs('Walk back down',R.hill,'Walk down slowly. Breathe deep.'));}
-    if(p===2){for(let i=1;i<=3;i++){hs.push(W('Long hill run '+i+'/3',45,'Strong steady pace all the way up.',{count:'hill'}));if(i<3)hs.push(Rs('Walk back down',90,'Full recovery before the next one.'));}}
-    blocks.push({name:'Hill sprints',steps:hs});
-    const rounds=p===0?2:3,cs=[Rs('Set up for the circuit',60,'Grab water. Find a flat spot near a low bar.')];
-    for(let r=1;r<=rounds;r++){
-      SAT_SLOTS.forEach((slot,i)=>{
-        exSteps(slot,cs,{count:'set',round:r,rounds});
-        const last=i===SAT_SLOTS.length-1;
-        if(!last)cs.push(Rs('Quick breather',R.trans,'',{nextSlot:SAT_SLOTS[i+1],round:r,rounds}));
-        else if(r<rounds)cs.push(Rs('Round break',R.round,'Drink some water. Next round coming.',{round:r,rounds}));
-      });
-    }
-    blocks.push({name:'Strength circuit',steps:cs,rounds});
-    return {day,w,title:'Hills + Strength',sub:'Hill sprints for speed, then a bodyweight circuit.',blocks};
-  }
-  if(day==='sun'){
-    const mode=sunMode(w),ms=[];
-    if(mode==='swim'){
-      const n=[8,9,10][p];
-      ms.push(W('Easy laps',180,'Warm-up. Any stroke, nice and relaxed.'));
-      for(let i=1;i<=n;i++){ms.push({k:'reps',name:'Swim 50 m · '+i+'/'+n,reps:50,unit:'metres',cue:'Solid pace. Tap DONE when you touch the wall.'});if(i<n)ms.push(Rs('Rest at the wall',30,'Catch your breath.'));}
-      ms.push(W('Easy laps',300,'Cool down. Slow and smooth.'));
-      blocks.push({name:'Swim',steps:ms});
-    } else {
-      const m=[40,45,55][p];
-      ms.push(W('Easy spin',300,'Warm up the legs. Low gear.'));
-      ms.push(W('Steady ride',m*60,'Talk test: you can still say short sentences. Add any hills you find.'));
-      blocks.push({name:'Ride',steps:ms});
-    }
-    blocks.push({name:'Skipping finisher',steps:skipBlock('sun-skip',w)});
-    return {day,w,title:mode==='swim'?'Swim + Skip':'Ride + Skip',sub:mode==='swim'?'Swim sets for your engine, then skipping.':'A steady ride for your engine, then skipping.',blocks,mode};
-  }
-  if(day==='wed'){
-    blocks.push({name:'Skipping',steps:skipBlock('wed-skip',w,true)});
-    const cs=[Rs('Get down for core',20,'Find a soft spot on the floor.')];
-    for(let r=1;r<=2;r++){WED_CORE.forEach((slot,i)=>{exSteps(slot,cs,{count:'set',round:r,rounds:2});
-      if(i<WED_CORE.length-1)cs.push(Rs('Quick breather',R.trans,'',{nextSlot:WED_CORE[i+1]}));else if(r<2)cs.push(Rs('Round break',30,'One more round.'));});}
-    blocks.push({name:'Core',steps:cs});
-    return {day,w,title:'Skip + Core',sub:'Optional bonus at home. 15 minutes.',blocks};
-  }
-  return null;
-}
-function skipBlock(slot,w,noIntro){
-  const p=phaseOf(w),n=[6,8,10][p],e=EX[exOf(slot)],st=[];
-  if(!noIntro)st.push({k:'rest',name:'Grab the rope',dur:60,cue:'Water, then rope ready.'});
-  for(let i=1;i<=n;i++){st.push({k:'work',name:'Skip '+i+'/'+n+' · '+e.n,dur:30,cue:e.cue,count:'skip'});if(i<n)st.push({k:'rest',name:'Rest',dur:S.rest.skip,cue:'Shake out the arms.'});}
-  return st;
-}
-function flatSteps(sess){const out=[];sess.blocks.forEach(b=>b.steps.forEach(s=>out.push(Object.assign({block:b.name},s))));return out;}
-function estMin(sess){let t=0;flatSteps(sess).forEach(s=>{t+=s.k==='reps'?(s.unit==='metres'?60:s.reps*(s.unit.startsWith('each')?6:3)+5):s.dur;});return Math.round(t/60);}
-
-/* ---------------- Scoring ---------------- */
-function logKey(w,day){return w+'-'+day;}
-function isDone(w,day){return !!S.log[logKey(w,day)];}
-function weekResult(w){const a=isDone(w,'sat'),b=isDone(w,'sun');return a&&b?'W':(a||b?'D':'');}
-function derived(){
-  let goals=0,beh=0,wins=0,run=0,best=0,fullWeek=false,sessions=0;
-  for(let w=1;w<=8;w++){
-    ['sat','sun'].forEach(d=>{if(isDone(w,d)){goals++;sessions++;}});
-    ['mon','wed'].forEach(d=>{if(isDone(w,d)){beh++;if(d==='wed')sessions++;}});
-    if(weekResult(w)==='W'){wins++;run++;best=Math.max(best,run);}else run=0;
-    if(['mon','wed','sat','sun'].every(d=>isDone(w,d)))fullWeek=true;
-  }
-  const st=Object.assign({},S.stats,{sessions,wins,bestRun:best,fullWeek,won4:weekResult(4)==='W'});
-  const medals=MEDALS.filter(m=>m.ok(st)).map(m=>m.id);
-  beh+=medals.length;
-  const pts=goals*6+beh;
-  let li=0;LEVELS.forEach((l,i)=>{if(pts>=l[0])li=i;});
-  const nextL=LEVELS[li+1];
-  const frac=nextL?(pts-LEVELS[li][0])/(nextL[0]-LEVELS[li][0]):1;
-  return {goals,beh,pts,medals,level:LEVELS[li][1],next:nextL,frac,wins};
-}
-
-/* ---------------- Native (Android app) bridge ---------------- */
-const NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
-const NP=NATIVE?(window.Capacitor.Plugins||{}):{};
-let notifReady=false;
-async function prepNotifs(){
-  if(!NATIVE||!NP.LocalNotifications||notifReady)return;
-  try{
-    const p=await NP.LocalNotifications.requestPermissions();
-    if(p&&p.display==='granted'){
-      try{await NP.LocalNotifications.createChannel({id:'timer',name:'Workout timer',description:'Alerts when a timer ends',importance:5,visibility:1,vibration:true});}catch(e){}
-      notifReady=true;
-    }
-  }catch(e){}
-}
-async function cancelNotifs(){
-  if(!notifReady)return;
-  try{const pend=await NP.LocalNotifications.getPending();if(pend&&pend.notifications&&pend.notifications.length)await NP.LocalNotifications.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});}catch(e){}
-}
-async function scheduleAhead(){
-  if(!notifReady||!P||P.paused)return;
-  const s=cur();if(s.k==='reps')return;
-  let t=Date.now()+Math.max(0,(s.dur-elapsed()))*1000;
-  const list=[];
-  for(let j=P.i+1;j<P.steps.length&&list.length<40;j++){
-    const n=P.steps[j];
-    const body=n.k==='rest'?(n.name+' · '+fmtT(n.dur)):(n.k==='reps'?(n.name+' · '+n.reps+' '+n.unit+'. Open the app and tap Done.'):(n.name+' · '+fmtT(n.dur)));
-    list.push({id:2000+j,title:n.k==='rest'?'Rest':'Go!',body,channelId:'timer',schedule:{at:new Date(t),allowWhileIdle:true},smallIcon:'ic_stat_ball',iconColor:'#E3122F'});
-    if(n.k==='reps')break;
-    t+=n.dur*1000;
-  }
-  if(list.length===0||P.i===P.steps.length-1){list.push({id:2999,title:'Session finished!',body:'Open the app to bank your goal.',channelId:'timer',schedule:{at:new Date(t),allowWhileIdle:true},smallIcon:'ic_stat_ball'});}
-  try{await NP.LocalNotifications.schedule({notifications:list});}catch(e){}
-}
-
-/* ---------------- Audio, voice, buzz ---------------- */
-let AC=null;
-function audio(){if(!S.sound)return null;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();}catch(e){AC=null;}return AC;}
-function beep(f,len,vol){const a=audio();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(vol||.12,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+len);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+len);}catch(e){}}
-function siren(){const a=audio();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type='sawtooth';o.frequency.setValueAtTime(330,a.currentTime);o.frequency.linearRampToValueAtTime(520,a.currentTime+1.2);g.gain.setValueAtTime(.14,a.currentTime);g.gain.linearRampToValueAtTime(.0001,a.currentTime+1.6);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+1.6);}catch(e){}}
-function buzz(p){if(!S.buzz)return;if(NATIVE&&NP.Haptics){try{const d=Array.isArray(p)?p.filter((x,i)=>i%2===0).reduce((a,b)=>a+b,0):p;NP.Haptics.vibrate({duration:Math.min(800,d)});}catch(e){}return;}if(navigator.vibrate){try{navigator.vibrate(p);}catch(e){}}}
-function say(t){if(!S.voice)return;if(NATIVE&&NP.TextToSpeech){try{NP.TextToSpeech.stop().catch(()=>{});NP.TextToSpeech.speak({text:t,lang:'en-AU',rate:1.0,pitch:1.0,volume:1.0,category:'playback'}).catch(()=>{});}catch(e){}return;}if(!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-AU';u.rate=1.05;speechSynthesis.speak(u);}catch(e){}}
-let lock=null;
-async function wake(on){if(NATIVE&&NP.KeepAwake){try{on?await NP.KeepAwake.keepAwake():await NP.KeepAwake.allowSleep();}catch(e){}return;}try{if(on&&'wakeLock' in navigator){lock=await navigator.wakeLock.request('screen');}else if(!on&&lock){await lock.release();lock=null;}}catch(e){}}
-
-/* ---------------- Icons & bits ---------------- */
-const IC={
-  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><ellipse cx="12" cy="12" rx="8" ry="10"/><path d="M12 2v20M4.5 8h15M4.5 16h15" opacity=".45"/></svg>',
-  drills:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg>',
-  medals:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 2l2 6M16 2l-2 6"/><circle cx="12" cy="15" r="6"/></svg>',
-  locker:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 21V8a6 6 0 0112 0v13M6 21h12M10 12h4"/></svg>',
-  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>',
-  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>',
-  prev:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 5L8 12l10 7zM5 5h2v14H5z"/></svg>',
-  next:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5l10 7-10 7zM17 5h2v14h-2z"/></svg>',
-  tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
-  ball:'<svg viewBox="0 0 24 24" width="22" height="22"><ellipse cx="12" cy="12" rx="10" ry="6.2" transform="rotate(-30 12 12)" fill="#c8102e"/><path d="M7 13.5l10-3" stroke="#fff" stroke-width="1.4" stroke-dasharray="1.6 1.2" transform="rotate(0)"/></svg>'
-};
-const nm=()=>S.name||'';
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function jumperSVG(){return '<svg viewBox="0 0 52 56"><path d="M14 2l-12 9 6 9 5-3v37h26V17l5 3 6-9-12-9c-2 4-6 6-12 6S16 6 14 2z" fill="#151112" stroke="#e3122f" stroke-width="2"/><path d="M19 2.5c1.5 3 4 4.2 7 4.2s5.5-1.2 7-4.2" fill="none" stroke="#e3122f" stroke-width="2"/></svg>';}
-
-/* ---------------- Views ---------------- */
-let tab='home',detail=null,lastView='';
-const root=document.getElementById('root');
-
-function render(){
-  const D=derived();
-  const vk=(detail||'')+tab+viewWeek,anim=vk!==lastView;lastView=vk;
-  let html='<div class="app'+(anim?' enter':'')+'">';
-  if(detail)html+=detailView(detail);
-  else if(tab==='home')html+=board(D)+homeView(D);
-  else if(tab==='drills')html+=drillsView();
-  else if(tab==='medals')html+=medalsView(D);
-  else html+=lockerView();
-  html+='</div>';
-  if(!detail)html+=navBar();
-  root.innerHTML=html;
-  if(!S.onboarded&&!sheetOpen)openOnboard();
-}
-function board(D){
-  const name=S.name||'Champ';
-  return `<div class="board">
-    <div class="jumper">${jumperSVG()}<b class="num">${esc(S.num||'—')}</b></div>
-    <div class="who"><div class="disp">${esc(name)}</div><small>Pre-season 2026/27</small></div>
-    <div class="score"><div class="disp num">${D.goals}<span>.</span>${D.beh} <span style="color:var(--chalk)">(${D.pts})</span></div><small>Season score</small></div>
-    <div class="lvl"><b>${D.level}</b><div class="bar"><i style="width:${Math.round(D.frac*100)}%"></i></div><span class="num">${D.next?(D.next[0]-D.pts)+' pts to '+D.next[1]:'Top rank!'}</span></div>
-  </div>`;
-}
-function homeView(D){
-  const w=viewWeek,p=phaseOf(w),cw=currentWeek();
-  const order=['sat','sun'];
-  const nextDay=order.find(d=>!isDone(w,d));
-  let hero='';
-  if(nextDay){
-    const s=buildSession(nextDay,w);
-    hero=`<div class="hero">
-      <div class="tag">${nm()?esc(nm())+', you\'re up':'Next up'} · ${fmt(dayDate(w,nextDay))}</div>
-      <h2 class="disp">${s.title}</h2>
-      <p>${s.sub}</p>
-      <div class="chips"><span class="chip">~${estMin(s)} min</span>${s.blocks.map(b=>`<span class="chip">${b.name}</span>`).join('')}</div>
-      <button class="kick" data-open="${nextDay}">${IC.ball} Let's go</button>
-    </div>`;
-  } else {
-    hero=`<div class="hero"><div class="tag">Round ${w} result</div><h2 class="disp">Round won!</h2><p>Both main sessions done. ${w<8?'Round '+(w+1)+' starts '+fmt(dayDate(w+1,'mon'))+'.':'That\'s the whole pre-season. Premiers!'}</p>
-      ${w<8?`<button class="kick" data-week="${w+1}">Go to round ${w+1}</button>`:''}</div>`;
-  }
-  const fx=[['mon','Footy training','At the club. Tick it off after.'],['wed','Skip + Core','Optional bonus · 15 min'],['sat','Hills + Strength','~'+estMin(buildSession('sat',w))+' min'],['sun',buildSession('sun',w).title,'~'+estMin(buildSession('sun',w))+' min']];
-  return `
-  <div class="round"><h1 class="disp">Round <em class="num">${w}</em></h1><div class="blk">${PHASES[p].weeks}<b>${PHASES[p].name}</b></div></div>
-  ${w!==cw?`<div class="muted" style="margin:-4px 2px 10px;font-size:14px">Viewing round ${w}. <button class="link" data-week="${cw}">Back to this week</button></div>`:''}
-  ${hero}
-  <div class="sect"><h3>This round</h3><small>${fmt(dayDate(w,'mon'))} – ${fmt(dayDate(w,'sun'))}</small></div>
-  <div class="fixture">${fx.map(([d,t,s])=>{const done=isDone(w,d);
-    const pill=done?'<span class="pill done">Done</span>':(d==='wed'?'<span class="pill opt">Bonus</span>':'<span class="pill todo">To play</span>');
-    const dd=dayDate(w,d);
-    return `<button class="fx ${done?'isdone':''}" data-open="${d}"><div class="day"><b>${dd.toLocaleDateString('en-AU',{weekday:'short'})}</b><small>${dd.getDate()} ${dd.toLocaleDateString('en-AU',{month:'short'})}</small></div><div><div class="t">${t}</div><div class="s">${s}</div></div>${pill}</button>`;}).join('')}</div>
-  <div class="sect"><h3>The ladder</h3><small>${D.wins} of 8 rounds won</small></div>
-  <div class="ladder">${[1,2,3,4,5,6,7,8].map(r=>{const res=weekResult(r);return `<button class="rd ${res} ${r===cw?'cur':''} ${r===w?'sel':''}" data-week="${r}" aria-label="Round ${r}"><small>RD</small><b class="num">${r}</b><small>${res||'·'}</small></button>`;}).join('')}</div>
-  <div class="tip"><span>${IC.ball}</span><div><b>${PHASES[p].name}:</b> ${PHASES[p].note} Win a round by finishing Saturday and Sunday. Each one kicks a goal (6 points). Footy, the Wednesday bonus and medals are behinds (1 point).</div></div>`;
-}
-function navBar(){
-  const b=(id,l)=>`<button class="${tab===id?'on':''}" data-tab="${id}">${IC[id]}<span>${l}</span></button>`;
-  return `<nav class="nav"><div class="in">${b('home','Rounds')}${b('drills','Drills')}${b('medals','Medals')}${b('locker','Locker')}</div></nav>`;
-}
-function slotRow(slot,w){
-  const k=exOf(slot),e=EX[k];
-  if(e.t==='skip')return `<div class="row"><div><div class="n">${e.n}</div><div class="c">${e.cue}</div><button class="swap" data-swap="${slot}">Swap style</button></div><div class="amt">30<small>sec</small></div></div>`;
-  const a=amountFor(slot,w),L=amtLabel(e,a);
-  return `<div class="row"><div><div class="n">${e.n}</div><div class="c">${e.cue}</div><button class="swap" data-swap="${slot}">Swap exercise</button></div>
-    <div class="ctl"><button class="step" data-adj="${slot}" data-d="-1" aria-label="Less">−</button><div class="amt num">${L.v}<small>${L.u}</small></div><button class="step" data-adj="${slot}" data-d="1" aria-label="More">+</button></div></div>`;
-}
-function detailView(day){
-  const w=viewWeek,dd=dayDate(w,day),done=isDone(w,day);
-  if(day==='mon'){
-    return `<button class="back" data-back>← Rounds</button>
-    <div class="dhead"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">Round ${w} · ${fmt(dd)}</div><h2 class="disp">Footy Training</h2><p>Club training counts. Give it everything, then tick it off for a behind.</p></div>
-    <div class="tip"><span>${IC.ball}</span><div><b>Rest tomorrow.</b> Tuesday is a rest day so your legs are fresh for the week.</div></div>
-    <div class="sticky"><div class="in"><button class="big" data-markmon>${done?'Trained ✓ (tap to undo)':'I trained tonight'}</button></div></div>`;
-  }
-  const s=buildSession(day,w);
-  let blocks='';
-  s.blocks.forEach(b=>{
-    blocks+=`<div class="blockhead"><h4>${b.name}</h4><small>${blockSummary(b)}</small></div>`;
-    if(b.name==='Strength circuit')blocks+=`<div class="card">${SAT_SLOTS.map(sl=>slotRow(sl,w)).join('')}</div>`;
-    else if(b.name==='Core')blocks+=`<div class="card">${WED_CORE.map(sl=>slotRow(sl,w)).join('')}</div>`;
-    else if(b.name.startsWith('Skipping'))blocks+=`<div class="card">${slotRow(day==='wed'?'wed-skip':'sun-skip',w)}</div>`;
-    else blocks+=`<div class="card">${compactSteps(b.steps)}</div>`;
-  });
-  return `<button class="back" data-back>← Rounds</button>
-  <div class="dhead"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">Round ${w} · ${fmt(dd)} · ~${estMin(s)} min</div><h2 class="disp">${s.title}</h2><p>${s.sub}</p></div>
-  ${day==='sun'?`<div class="seg" role="group" aria-label="Swim or ride"><button class="${s.mode==='swim'?'on':''}" data-mode="swim">Swim</button><button class="${s.mode==='ride'?'on':''}" data-mode="ride">Ride</button></div>`:''}
-  ${blocks}
-  ${done?`<div class="tip"><span>${IC.tick}</span><div><b>Already done this round.</b> You can run it again any time, but it only scores once. <button class="link" data-undo="${day}">Undo</button></div></div>`:''}
-  <div style="text-align:center;margin-top:14px">${done?'':`<button class="link" data-markdone="${day}">I did this without the app</button>`}</div>
-  <div style="height:90px"></div>
-  <div class="sticky"><div class="in"><button class="big" data-start="${day}">${done?'Run it again':'Kick off'}</button></div></div>`;
-}
-function blockSummary(b){
-  if(b.rounds)return b.rounds+' rounds';
-  const work=b.steps.filter(s=>s.k!=='rest');
-  if(b.name==='Hill sprints'){const h=work.filter(s=>s.count==='hill');return h.length+' efforts';}
-  if(b.name.startsWith('Skip'))return work.length+' × 30 sec';
-  const t=b.steps.reduce((a,s)=>a+(s.dur||0),0);return Math.round(t/60)+' min';
-}
-function compactSteps(steps){
-  const rows=[];
-  steps.filter(s=>s.k!=='rest').forEach(s=>{
-    const base=s.name.replace(/\s\d+\/\d+.*$/,'');
-    const last=rows[rows.length-1];
-    if(last&&last.base===base&&last.val===val(s)){last.n++;}else rows.push({base,val:val(s),n:1});
-  });
-  return rows.map(r=>`<div class="simple"><span>${r.n>1?r.n+' × ':''}${esc(r.base)}</span><span class="num">${r.val}</span></div>`).join('');
-  function val(s){return s.k==='reps'?(s.unit==='metres'?s.reps+' m':s.reps+' '+s.unit):fmtT(s.dur);}
-}
-function fmtT(sec){sec=Math.max(0,Math.ceil(sec));if(sec<60)return sec+' sec';const m=Math.floor(sec/60),s=sec%60;return s?m+':'+String(s).padStart(2,'0')+' min':m+' min';}
-function drillsView(){
-  const w=viewWeek;
-  return `<div class="dhead" style="margin-top:6px"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">Round ${w} · ${PHASES[phaseOf(w)].name}</div><h2 class="disp">Your drills</h2><p>Bored of one? Swap it. Too easy or too hard? Change the reps. It all saves for next time.</p></div>
-  <div class="blockhead"><h4>Saturday circuit</h4><small>${phaseOf(w)===0?2:3} rounds</small></div><div class="card">${SAT_SLOTS.map(s=>slotRow(s,w)).join('')}</div>
-  <div class="blockhead"><h4>Skipping styles</h4><small>Sun + Wed</small></div><div class="card">${slotRow('sun-skip',w)}${slotRow('wed-skip',w)}</div>
-  <div class="blockhead"><h4>Wednesday core</h4><small>2 rounds</small></div><div class="card">${WED_CORE.map(s=>slotRow(s,w)).join('')}</div>
-  <div style="text-align:center;margin-top:16px"><button class="link" data-resetdrills>Put all drills back to the original plan</button></div>`;
-}
-function medalsView(D){
-  const st=S.stats;
-  return `<div class="dhead" style="margin-top:6px"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">${D.medals.length} of ${MEDALS.length} won · each one is a behind</div><h2 class="disp">Medals</h2></div>
-  <div class="medals" style="margin-top:14px">${MEDALS.map(m=>`<div class="medal ${D.medals.includes(m.id)?'on':''}"><div class="m">${m.m}</div><b>${m.n}</b><small>${m.d}</small></div>`).join('')}</div>
-  <div class="sect"><h3>Season stats</h3></div>
-  <div class="card">
-    <div class="simple"><span>Sessions finished</span><span class="num">${derived().goals+Object.keys(S.log).filter(k=>k.endsWith('-wed')).length}</span></div>
-    <div class="simple"><span>Hill sprints</span><span class="num">${st.hills}</span></div>
-    <div class="simple"><span>Skipping rounds</span><span class="num">${st.skips}</span></div>
-    <div class="simple"><span>Circuit sets</span><span class="num">${st.sets}</span></div>
-    <div class="simple"><span>Rounds won</span><span class="num">${D.wins} / 8</span></div>
-  </div>`;
-}
-function lockerView(){
-  const r=S.rest;
-  const restRow=(k,l)=>`<div class="row"><div><div class="n">${l}</div></div><div class="ctl"><button class="step" data-rest="${k}" data-d="-5" aria-label="Less">−</button><div class="amt num">${r[k]}<small>sec</small></div><button class="step" data-rest="${k}" data-d="5" aria-label="More">+</button></div></div>`;
-  const tg=(k,l)=>`<div class="tog"><span>${l}</span><button class="sw ${S[k]?'on':''}" data-tog="${k}" role="switch" aria-checked="${S[k]}" aria-label="${l}"></button></div>`;
-  return `<div class="dhead" style="margin-top:6px"><h2 class="disp">Locker</h2><p>Your settings.</p></div>
-  <div class="card" style="margin-top:14px">
-    <div class="field"><label for="f-name">Your name</label><input id="f-name" value="${esc(S.name)}" maxlength="16" autocomplete="off"></div>
-    <div class="field"><label for="f-num">Jumper number</label><input id="f-num" value="${esc(S.num)}" inputmode="numeric" maxlength="2"></div>
-    <div class="field"><label for="f-start">Round 1 starts (a Monday)</label><input id="f-start" type="date" value="${S.start}"></div>
-  </div>
-  <div class="blockhead"><h4>Timer</h4></div>
-  <div class="card">${tg('sound','Beeps')}${tg('voice','Voice coach')}${tg('buzz','Vibrate')}</div>
-  <div class="blockhead"><h4>Rest times</h4></div>
-  <div class="card">${restRow('round','Between circuit rounds')}${restRow('trans','Between exercises')}${restRow('hill','Hill walk-down')}${restRow('skip','Between skipping rounds')}</div>
-  ${NATIVE?`<div class="tip"><span>${IC.ball}</span><div><b>Locked phone?</b> No worries. The timer keeps running and you'll get an alert when each step ends. Allow notifications when asked.</div></div>`:`<div class="tip"><span>${IC.ball}</span><div><b>Put it on your home screen:</b> open this page in Chrome, tap the ⋮ menu, then <b>Add to Home screen</b>. Keep the phone unlocked during a session so the beeps work.</div></div>`}
-  <div style="text-align:center;margin-top:10px"><button class="danger" data-reset>Reset the whole season</button></div>`;
-}
-
-/* ---------------- Sheets ---------------- */
-let sheetOpen=false;
-function sheet(html,onClick){
-  closeSheet();sheetOpen=true;
-  const el=document.createElement('div');el.className='scrim';el.id='scrim';
-  el.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
-  el.addEventListener('click',e=>{if(e.target===el){closeSheet();return;}onClick&&onClick(e);});
-  document.body.appendChild(el);
-}
-function closeSheet(){const s=document.getElementById('scrim');if(s)s.remove();sheetOpen=false;}
-function openSwap(slot){
-  const cur=exOf(slot),cat=EX[cur].cat;
-  const opts=Object.keys(EX).filter(k=>EX[k].cat===cat);
-  sheet(`<h3>Swap ${CAT[cat]}</h3><p>Pick something new. It works the same muscles.</p>
-    <button class="surprise" data-pick="__rand">Surprise me</button>
-    ${opts.map(k=>`<button class="opt ${k===cur?'cur':''}" data-pick="${k}"><b>${EX[k].n}${k===cur?' · current':''}</b><small>${EX[k].why} ${EX[k].cue}</small></button>`).join('')}`,
-  e=>{const b=e.target.closest('[data-pick]');if(!b)return;let k=b.dataset.pick;
-    if(k==='__rand'){const o=opts.filter(x=>x!==cur);k=o[Math.floor(Math.random()*o.length)];}
-    if(k!==cur){S.slots[slot]=k;delete S.adj[slot];S.stats.swaps++;save();toast('Swapped in '+EX[k].n);}
-    closeSheet();render();});
-}
-function confirmSheet(title,text,yes,fn){
-  sheet(`<h3>${title}</h3><p>${text}</p><button class="big" data-yes>${yes}</button><div style="text-align:center;margin-top:8px"><button class="link" data-no>Cancel</button></div>`,
-  e=>{if(e.target.closest('[data-yes]')){closeSheet();fn();}else if(e.target.closest('[data-no]'))closeSheet();});
-}
-function openOnboard(){
-  sheet(`<h3>Welcome to pre-season</h3><p>Eight rounds of training with Dad. Put your name and number on the jumper. The voice coach will call you by name.</p>
-  <div class="field"><label for="o-name">Your name</label><input id="o-name" maxlength="16" autocomplete="off" placeholder="First name"></div>
-  <div class="field"><label for="o-num">Jumper number</label><input id="o-num" inputmode="numeric" maxlength="2" placeholder="e.g. 9"></div>
-  <button class="big" data-go style="margin-top:14px">Run out onto the ground</button>`,
-  e=>{if(!e.target.closest('[data-go]'))return;S.name=document.getElementById('o-name').value.trim();S.num=document.getElementById('o-num').value.replace(/\D/g,'').slice(0,2);S.onboarded=true;save();closeSheet();render();});
-}
-function toast(t){const o=document.querySelector('.toast');if(o)o.remove();const el=document.createElement('div');el.className='toast';el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),1800);}
-
-/* ---------------- Events ---------------- */
-root.addEventListener('click',e=>{
-  const t=e.target.closest('button');if(!t)return;
-  const d=t.dataset;
-  if(d.tab){tab=d.tab;detail=null;render();scrollTo(0,0);}
-  else if(d.open){detail=d.open;render();scrollTo(0,0);}
-  else if(d.back!==undefined){detail=null;render();scrollTo(0,0);}
-  else if(d.week){viewWeek=+d.week;detail=null;tab='home';render();}
-  else if(d.swap){openSwap(d.swap);}
-  else if(d.adj){const slot=d.adj,e2=EX[exOf(slot)],step=e2.t==='time'?5:1,old=S.adj[slot]||0,v0=amountFor(slot,viewWeek);
-    S.adj[slot]=old+step*(+d.d);
-    const v1=amountFor(slot,viewWeek),max=e2.t==='time'?120:40;
-    if(v1===v0||v1>max)S.adj[slot]=old;save();render();}
-  else if(d.mode){S.sunMode[viewWeek]=d.mode;save();render();}
-  else if(d.start){startPlayer(d.start);}
-  else if(d.markdone){complete(d.markdone,null,true);}
-  else if(d.markmon!==undefined){if(isDone(viewWeek,'mon'))delete S.log[logKey(viewWeek,'mon')];else{const before=derived().medals;S.log[logKey(viewWeek,'mon')]={at:Date.now()};save();const nm=derived().medals.filter(m=>!before.includes(m));toast(nm.length?'Behind! + new medal':'Behind! +1 point');}save();render();}
-  else if(d.undo){confirmSheet('Undo this session?','It comes off your score for round '+viewWeek+'.','Undo it',()=>{delete S.log[logKey(viewWeek,d.undo)];save();render();});}
-  else if(d.tog){S[d.tog]=!S[d.tog];save();render();}
-  else if(d.rest){S.rest[d.rest]=Math.max(5,Math.min(240,S.rest[d.rest]+(+d.d)));save();render();}
-  else if(d.resetdrills!==undefined){confirmSheet('Back to the original plan?','All swaps and rep changes are cleared.','Reset drills',()=>{S.slots={};S.adj={};save();render();});}
-  else if(d.reset!==undefined){confirmSheet('Reset the whole season?','This clears every result, medal and setting on this phone.','Reset everything',()=>{S=JSON.parse(JSON.stringify(DEFAULT));save();viewWeek=currentWeek();tab='home';render();});}
-});
-root.addEventListener('change',e=>{
-  const id=e.target.id;
-  if(id==='f-name'){S.name=e.target.value.trim();save();}
-  if(id==='f-num'){S.num=e.target.value.replace(/\D/g,'').slice(0,2);save();}
-  if(id==='f-start'&&e.target.value){S.start=e.target.value;viewWeek=currentWeek();save();}
-});
-
-/* ---------------- Player ---------------- */
-let P=null,timerId=null;
-function startPlayer(day){
-  const sess=buildSession(day,viewWeek);
-  const steps=[{k:'ready',name:'Get ready',dur:5,cue:'First up: '+firstWork(sess),block:sess.blocks[0].name}].concat(flatSteps(sess));
-  P={day,w:viewWeek,sess,steps,i:0,start:performance.now(),paused:false,pausedAt:0,acc:0,lastBeep:null,counts:{sets:0,hills:0,skips:0}};
-  audio();wake(true);prepNotifs();
-  const el=document.createElement('div');el.className='player';el.id='player';document.body.appendChild(el);
-  el.addEventListener('click',playerClick);
-  enterStep();
-  timerId=setInterval(tick,200);
-}
-function firstWork(sess){const s=flatSteps(sess).find(x=>x.k!=='rest');return s?s.name:'';}
-function cur(){return P.steps[P.i];}
-function elapsed(){return ((P.paused?P.pausedAt:performance.now())-P.start-P.acc)/1000;}
-function enterStep(){
-  const s=cur();P.start=performance.now();P.acc=0;P.paused=false;P.lastBeep=null;
-  if(s.k==='work'){beep(880,.35);buzz([180]);say(s.name.replace(/\s\d+\/\d+/,'').replace(' · ',', ')+'. Go!');}
-  else if(s.k==='rest'){beep(520,.3);buzz([90,60,90]);const nx=nextWorkName();say(s.name+(nx?'. Next, '+nx.replace(/\s\d+\/\d+/,'').replace(' · ',', '):''));}
-  else if(s.k==='reps'){beep(880,.35);buzz([180]);say(s.name.replace(/\s·\s\d+\/\d+/,'')+'. '+(s.unit==='metres'?'':s.reps+' '+s.unit.replace('each','each'))+'.');}
-  else if(s.k==='ready'){say((nm()?'Righto '+nm()+', get ready. ':'Get ready. ')+s.cue);}
-  drawPlayer(true);
-}
-function nextWorkName(){for(let j=P.i+1;j<P.steps.length;j++){if(P.steps[j].k!=='rest')return P.steps[j].name;}return '';}
-function tick(){
-  if(!P||P.paused)return;
-  const s=cur();
-  if(s.k==='reps'){drawPlayer();return;}
-  let left=s.dur-elapsed();
-  if(left<=0){
-    /* catch up if the phone was locked: carry leftover time into the next steps */
-    let over=-left,guard=0;
-    countStep(s);P.i++;
-    while(P.i<P.steps.length&&P.steps[P.i].k!=='reps'&&over>=P.steps[P.i].dur&&guard++<500){over-=P.steps[P.i].dur;countStep(P.steps[P.i]);P.i++;}
-    if(P.i>=P.steps.length){finishPlayer();return;}
-    if(over>1.5){P.start=performance.now()-over*1000;P.acc=0;P.paused=false;P.lastBeep=null;drawPlayer(true);}
-    else enterStep();
-    return;
-  }
-  const whole=Math.ceil(left);
-  if(whole<=3&&whole>=1&&P.lastBeep!==whole){P.lastBeep=whole;beep(660,.12);}
-  drawPlayer();
-}
-function countStep(s){if(s.count==='set')P.counts.sets++;else if(s.count==='hill')P.counts.hills++;else if(s.count==='skip')P.counts.skips++;}
-function advance(dir){
-  const s=cur();
-  if(dir>0&&(s.k==='work'||s.k==='reps'))countStep(s);
-  P.i+=dir;
-  if(P.i<0)P.i=0;
-  if(P.i>=P.steps.length){finishPlayer();return;}
-  enterStep();
-}
-function ovalSVG(frac,mode){
-  const cx=150,cy=180,rx=128,ry=166;
-  const col=mode==='work'?'#e3122f':mode==='rest'?'#31c374':'#f3b53f';
-  const th=-Math.PI/2+2*Math.PI*Math.min(1,Math.max(0,frac));
-  const bx=cx+rx*Math.cos(th),by=cy+ry*Math.sin(th);
-  const ang=Math.atan2(ry*Math.cos(th),-rx*Math.sin(th))*180/Math.PI;
-  return `<svg viewBox="0 0 300 360" aria-hidden="true">
-    <defs><radialGradient id="g" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#1d3a28"/><stop offset="1" stop-color="#0e1a13"/></radialGradient></defs>
-    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#g)" opacity=".55"/>
-    <g fill="none" stroke="rgba(244,239,230,.16)" stroke-width="1.6">
-      <rect x="125" y="155" width="50" height="50"/>
-      <circle cx="150" cy="180" r="9"/>
-      <path d="M90 ${cy-ry+18} A70 62 0 0 0 210 ${cy-ry+18}"/>
-      <path d="M90 ${cy+ry-18} A70 62 0 0 1 210 ${cy+ry-18}"/>
-      <rect x="138" y="${cy-ry+2}" width="24" height="10"/>
-      <rect x="138" y="${cy+ry-12}" width="24" height="10"/>
-    </g>
-    <g stroke="rgba(244,239,230,.55)" stroke-width="2.4" stroke-linecap="round">
-      <path d="M140 ${cy-ry} v-12 M160 ${cy-ry} v-12 M132 ${cy-ry+1} v-7 M168 ${cy-ry+1} v-7"/>
-      <path d="M140 ${cy+ry} v12 M160 ${cy+ry} v12 M132 ${cy+ry-1} v7 M168 ${cy+ry-1} v7"/>
-    </g>
-    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="rgba(244,239,230,.10)" stroke-width="12"/>
-    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" pathLength="100" stroke-dasharray="${(frac*100).toFixed(2)} 100" transform="rotate(-90 ${cx} ${cy})" style="filter:drop-shadow(0 0 8px ${col}88)"/>
-    <g transform="translate(${bx.toFixed(1)} ${by.toFixed(1)}) rotate(${ang.toFixed(1)})">
-      <ellipse rx="13" ry="8.5" fill="#c8102e" stroke="#fff" stroke-width="1.6"/>
-      <path d="M-5 0h10" stroke="#fff" stroke-width="1.4" stroke-dasharray="1.6 1.3"/>
-    </g>
-  </svg>`;
-}
-function fitOval(){
-  const el=document.getElementById('player'),o=el&&el.querySelector('.oval');if(!o)return;
-  const W=o.clientWidth,H=o.clientHeight;
-  const h=Math.max(120,Math.min(H-8,(W-8)*360/300,460)),w=h*300/360;
-  el.style.setProperty('--ovh',h.toFixed(0)+'px');el.style.setProperty('--ovw',w.toFixed(0)+'px');
-}
-window.addEventListener('resize',()=>{if(P)fitOval();});
-let lastI=-1;
-function drawPlayer(full){
-  const el=document.getElementById('player');if(!el)return;
-  const s=cur(),mode=s.k==='reps'?'work':s.k;
-  el.className='player '+mode;
-  let frac,big,unit,phase;
-  if(s.k==='reps'){const t=elapsed();frac=(t%60)/60;big=s.reps;unit=s.unit;phase='Reps · '+Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');}
-  else{const left=Math.max(0,s.dur-elapsed());frac=1-left/s.dur;big=fmtClock(left);unit=s.dur>=60?'min':'sec';phase=s.k==='work'?'Work':s.k==='rest'?'Rest':'Get ready';}
-  if(full||lastI!==P.i){
-    lastI=P.i;
-    const nx=nextStepLabel();
-    const roundTxt=s.round?` · Round ${s.round}/${s.rounds}`:'';
-    const sub=s.nextSlot?('Next: '+EX[exOf(s.nextSlot)].n):s.cue;
-    el.innerHTML=`
-      <div class="ptop"><button class="x" data-p="exit" aria-label="Stop session">✕</button><div class="lab">${esc(s.block)}${roundTxt}<b class="num">${P.i+1} / ${P.steps.length}</b></div><button class="x" data-p="mute" aria-label="Sound on or off">${S.sound?'🔊':'🔈'}</button></div>
-      <div class="prog"><i style="width:${(P.i/P.steps.length*100).toFixed(1)}%"></i></div>
-      <div class="oval"><div id="ov">${ovalSVG(frac,mode)}</div><div class="center"><div><div class="phase" id="ph" style="color:${mode==='work'?'#ff5a6e':mode==='rest'?'var(--turf)':'var(--gold)'}">${phase}</div><div class="big-t" id="bt">${big}</div><div class="unit" id="un">${unit}</div></div></div></div>
-      <div class="pname"><h2>${esc(s.name)}</h2><p>${esc(sub)}</p></div>
-      <div class="next">${nx?`<span>Then: <b>${esc(nx)}</b></span>`:'<span><b>Last one'+(nm()?', '+esc(nm()):'')+'!</b></span>'}</div>
-      <div class="pctl"><button class="sm" data-p="prev" aria-label="Previous">${IC.prev}</button>
-        ${s.k==='reps'?`<button class="main go" data-p="done">${IC.tick} Done</button>`:`<button class="main" data-p="pause" id="pp">${P.paused?IC.play+' Resume':IC.pause+' Pause'}</button>`}
-        <button class="sm" data-p="next" aria-label="${s.k==='rest'?'Skip rest':'Next'}">${IC.next}</button></div>`;
-    fitOval();
-  } else {
-    const ov=document.getElementById('ov');if(ov)ov.innerHTML=ovalSVG(frac,mode);
-    const bt=document.getElementById('bt');if(bt)bt.textContent=big;
-    const ph=document.getElementById('ph');if(ph)ph.textContent=phase;
-    const un=document.getElementById('un');if(un)un.textContent=unit;
-  }
-}
-function nextStepLabel(){const n=P.steps[P.i+1];if(!n)return '';if(n.k==='rest')return n.name+' '+fmtT(n.dur);return n.name+(n.k==='reps'?' × '+n.reps:' '+fmtT(n.dur));}
-function fmtClock(sec){sec=Math.max(0,Math.ceil(sec));const m=Math.floor(sec/60),s=sec%60;return m?m+':'+String(s).padStart(2,'0'):String(s);}
-function playerClick(e){
-  const b=e.target.closest('[data-p]');if(!b)return;const a=b.dataset.p;
-  audio();
-  if(a==='pause'){if(P.paused){P.acc+=performance.now()-P.pausedAt;P.paused=false;}else{P.paused=true;P.pausedAt=performance.now();if(window.speechSynthesis)speechSynthesis.cancel();}drawPlayer(true);}
-  else if(a==='next'||a==='done'){advance(1);}
-  else if(a==='prev'){if(elapsed()>3&&cur().k!=='reps'){enterStep();}else advance(-1);}
-  else if(a==='mute'){S.sound=!S.sound;S.voice=S.sound;save();drawPlayer(true);}
-  else if(a==='exit'){
-    const wasPaused=P.paused;if(!wasPaused){P.paused=true;P.pausedAt=performance.now();}
-    sheet(`<h3>Stop the session?</h3><p>You're ${Math.round(P.i/P.steps.length*100)}% through. Stopping now doesn't count for the round.</p><button class="big" data-keep>Keep going</button><div style="text-align:center;margin-top:8px"><button class="link" data-stop>Stop session</button></div>`,
-      ev=>{if(ev.target.closest('[data-keep]')){closeSheet();if(!wasPaused){P.acc+=performance.now()-P.pausedAt;P.paused=false;}drawPlayer(true);}
-           else if(ev.target.closest('[data-stop]')){closeSheet();stopPlayer();}});
-    document.getElementById('scrim').style.zIndex=35;
-  }
-}
-function stopPlayer(){cancelNotifs();clearInterval(timerId);timerId=null;wake(false);if(window.speechSynthesis)speechSynthesis.cancel();const el=document.getElementById('player');if(el)el.remove();P=null;render();}
-function finishPlayer(){
-  const p=P;cancelNotifs();clearInterval(timerId);timerId=null;wake(false);
-  const el=document.getElementById('player');if(el)el.remove();
-  P=null;
-  complete(p.day,p.counts,false,p.w);
-}
-function complete(day,counts,manual,w){
-  w=w||viewWeek;
-  const before=derived();
-  const already=isDone(w,day);
-  const resBefore=weekResult(w);
-  if(counts){S.stats.sets+=counts.sets;S.stats.hills+=counts.hills;S.stats.skips+=counts.skips;}
-  else if(manual){const s=buildSession(day,w),f=flatSteps(s);f.forEach(x=>{if(x.count==='set')S.stats.sets++;if(x.count==='hill')S.stats.hills++;if(x.count==='skip')S.stats.skips++;});}
-  if(!already)S.log[logKey(w,day)]={at:Date.now(),manual:!!manual};
-  save();
-  const after=derived();
-  const newM=MEDALS.filter(m=>after.medals.includes(m.id)&&!before.medals.includes(m.id));
-  const isGoal=(day==='sat'||day==='sun');
-  const won=resBefore!=='W'&&weekResult(w)==='W';
-  siren();buzz([200,100,200,100,400]);
-  if(S.voice)say(already?'Session done. Great work'+(nm()?', '+nm():'')+'.':(isGoal?'Goal! Great work'+(nm()?', '+nm():'')+'.':'Behind! Nice bonus work'+(nm()?', '+nm():'')+'.'));
-  root.innerHTML='';
-  const fin=document.createElement('div');fin.className='fin';fin.id='fin';
-  fin.innerHTML=`<div class="goal">${already?'Done!':(isGoal?'Goal!':'Behind!')}</div>
-    <div class="sub">${already?'Extra session':(isGoal?'+6 points':'+1 point')}</div>
-    ${won&&!already?`<p style="color:var(--chalk);font-weight:700;font-size:18px">Round ${w} won!</p>`:''}
-    ${nm()?`<p style="color:var(--chalk);font-family:var(--display);font-size:26px;font-weight:800;text-transform:uppercase;margin:12px 0 0">Well played, ${esc(nm())}${S.num?' · #'+esc(S.num):''}</p>`:''}
-    <p>Score now <b class="num" style="color:var(--chalk)">${after.goals}.${after.beh} (${after.pts})</b> · ${after.level}</p>
-    ${newM.length?`<div class="newm">${newM.map(m=>`<div class="medal on"><div class="m">${m.m}</div><b>${m.n}</b><small>New medal · +1</small></div>`).join('')}</div>`:''}
-    <button class="big" id="finok">Back to the rooms</button>`;
-  document.body.appendChild(fin);
-  confetti();
-  document.getElementById('finok').onclick=()=>{fin.remove();document.getElementById('confetti').hidden=true;detail=null;tab='home';render();scrollTo(0,0);};
-}
-
-/* ---------------- Confetti ---------------- */
-function confetti(){
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  const c=document.getElementById('confetti');c.hidden=false;const x=c.getContext('2d');
-  const W=c.width=innerWidth*devicePixelRatio,H=c.height=innerHeight*devicePixelRatio;
-  const cols=['#e3122f','#f4efe6','#111','#e3122f','#f3b53f'];
-  const ps=Array.from({length:140},()=>({x:W/2,y:H*.35,vx:(Math.random()-.5)*W*.03,vy:-Math.random()*H*.025-H*.008,r:Math.random()*Math.PI,vr:(Math.random()-.5)*.3,s:(6+Math.random()*8)*devicePixelRatio,c:cols[Math.floor(Math.random()*cols.length)]}));
-  let f=0;(function loop(){x.clearRect(0,0,W,H);ps.forEach(p=>{p.vy+=H*.0009;p.x+=p.vx;p.y+=p.vy;p.vx*=.99;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore();});
-    if(++f<170&&document.getElementById('fin'))requestAnimationFrame(loop);else{x.clearRect(0,0,W,H);c.hidden=true;}})();
-}
-
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'){cancelNotifs();if(P){wake(true);tick();}}
-  else if(P&&!P.paused){scheduleAhead();}
-});
-if(NATIVE&&NP.App){NP.App.addListener('backButton',()=>{
-  if(sheetOpen){closeSheet();return;}
-  if(P){const x=document.querySelector('#player [data-p="exit"]');if(x)x.click();return;}
-  if(document.getElementById('fin')){const b=document.getElementById('finok');if(b)b.click();return;}
-  if(detail){detail=null;render();scrollTo(0,0);return;}
-  if(tab!=='home'){tab='home';render();scrollTo(0,0);return;}
-  NP.App.minimizeApp&&NP.App.minimizeApp();
-});
-NP.App.addListener('appStateChange',st=>{if(st.isActive){cancelNotifs();if(P)tick();}else if(P&&!P.paused)scheduleAhead();});}
-
-/* expose for tests */
-window.__app={buildSession,flatSteps,estMin,derived,amountFor,S:()=>S,setState:o=>{S=deepMerge(JSON.parse(JSON.stringify(DEFAULT)),o);save();viewWeek=currentWeek();render();},phaseOf,setWeek:w=>{viewWeek=w;render();}};
-
-render();
-})();
-</script>
+<svg id="measure" width="0" height="0" style="position:absolute" aria-hidden="true"><path id="mpath" d=""/></svg>
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

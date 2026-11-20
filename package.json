@@ -2,7 +2,7 @@
   "name": "pre-season-bomber",
   "version": "1.0.0",
   "private": true,
-  "description": "8-week footy pre-season training app",
+  "description": "8-week multi-sport pre-season training app for young athletes",
   "scripts": {
     "sync": "cap sync android"
   },
