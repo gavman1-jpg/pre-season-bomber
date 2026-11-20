@@ -1,6 +1,6 @@
 {
   "appId": "au.com.preseasonbomber.app",
-  "appName": "Pre-Season Bomber",
+  "appName": "Full Season",
   "webDir": "www",
   "android": { "backgroundColor": "#0c0a0b" },
   "plugins": {

@@ -7,7 +7,8 @@ const KEY='rb-preseason-v1';
 const DEFAULT={v:2,name:'',num:'',start:'2026-11-23',sound:true,voice:true,buzz:true,
   sport:'',age:0,exp:'some',growth:false,parentOk:false,
   rest:{round:60,trans:15,hill:60,skip:30},
-  slots:{},adj:{},log:{},stats:{sets:0,sprints:0,cond:0,skills:0,swaps:0},sunMode:{},seenMedals:[],onboarded:false};
+  slots:{},adj:{},log:{},stats:{sets:0,sprints:0,cond:0,skills:0,swaps:0},sunMode:{},seenMedals:[],onboarded:false,
+  season:{on:false,start:'',weeks:18,train:[1,3],game:5,trainMin:90,gameMin:60},ilog:{},team:null};
 let S=load();
 function load(){
   try{const raw=localStorage.getItem(KEY);if(raw){return migrate(JSON.parse(raw));}}catch(e){}
@@ -135,6 +136,7 @@ function buildSession(day,w,opt){
   };
   const skip=n=>{const st=[];const d=mini?20:30;for(let i=1;i<=n;i++){st.push(W('Skip '+i+'/'+n,d,'Light bounces, wrists turn the rope.',{count:'cond'}));if(i<n)st.push(Rs('Rest',R.skip,'Shake out the arms.'));}return st;};
   const sprintScale=b.sprint*(S.growth?.75:1)*(lite?.7:1);
+  const rot=opt.rot!=null?opt.rot:(w-1);
 
   if(day==='sat'){
     const wu=[W('Easy jog',mini?120:180,'Nice and easy. Loosen up.')].concat(t.wu.map(x=>W(x[0],x[1],x[2])));
@@ -161,7 +163,7 @@ function buildSession(day,w,opt){
     blocks.push({name:'Warm-up',steps:[W('Easy jog',mini?120:180,'Nice and easy.'),W(t.wu[0][0],t.wu[0][1],t.wu[0][2])]});
     const sk=[];
     const nsk=mini?2:3;
-    for(let j=0;j<nsk;j++){const s=skillAt((w-1)*nsk+j);sk.push(W(s[0],b.skillT,s[1],{count:'skill'}));if(j<nsk-1)sk.push(Rs('Reset',20,'Grab the ball. Next skill.'));}
+    for(let j=0;j<nsk;j++){const s=skillAt(rot*nsk+j);sk.push(W(s[0],b.skillT,s[1],{count:'skill'}));if(j<nsk-1)sk.push(Rs('Reset',20,'Grab the ball. Next skill.'));}
     blocks.push({name:'Skills',steps:sk});
     const cs=[],cm=b.cond*(lite?.7:1)*(S.growth?.85:1);
     if(mode==='swim'){
@@ -187,8 +189,32 @@ function buildSession(day,w,opt){
     const lab=mode==='swim'?'Swim':mode==='ride'?'Ride':'Engine';
     return {day,w,lite,mode,title:lab+' + Skills',sub:'Skills while you\'re fresh, then build your engine.',blocks};
   }
+  if(day==='strength'){
+    blocks.push({name:'Warm-up',steps:[W('Easy jog',120,'Nice and easy.')].concat(t.wu.map(x=>W(x[0],x[1],x[2])))});
+    const d=t.speed[0],n=mini?3:4,dur=mini?Math.max(3,Math.round(d.d*.7)):Math.min(d.d,10),rest=Math.max(R.hill,r5(dur*5*b.rest)),sp=[];
+    for(let i=1;i<=n;i++){sp.push(W(d.n+' '+i+'/'+n,dur,d.cue+' Sharp, not exhausting.',{count:'sprint'}));if(i<n)sp.push(Rs('Walk back',rest,'Full recovery.'));}
+    blocks.push({name:'Speed touch',steps:sp});
+    blocks.push(circuit(A_SLOTS,Math.min(2,rounds(1,lite)),mini?'Fun circuit':'Strength circuit'));
+    blocks.push(cool());
+    return {day,w,lite,title:'Strength Top-Up',sub:'One session a week keeps your pre-season strength and speed through the season.',blocks};
+  }
+  if(day==='recovery'){
+    blocks.push({name:'Easy movement',steps:[W('Easy walk, ride or swim',mini?600:900,'Really easy. You should be able to chat the whole time.')]});
+    blocks.push({name:'Mobility',steps:[W('Hip openers',60,'Open the gate both ways, slow and controlled.'),W('Leg swings',60,'Front-to-back and side-to-side, gently.'),
+      W('Cat-cow + child\'s pose',60,'On all fours, round and arch the back, then sit back and breathe.'),W('Calf + hamstring stretch',90,'45 seconds each side. No bouncing.'),W('Quad + hip flexor stretch',90,'45 seconds each side.')]});
+    return {day,w,lite,title:'Recovery',sub:'The day after the game. Easy movement and stretching to help the legs bounce back.',blocks};
+  }
+  if(day==='primer'){
+    blocks.push({name:'Warm-up',steps:[W('Easy jog',120,'Nice and easy.'),W(t.wu[0][0],t.wu[0][1],t.wu[0][2])]});
+    const sk=[];[0,1].forEach(j=>{const x=skillAt(rot*2+j);sk.push(W(x[0],Math.round(b.skillT*.6/5)*5,x[1],{count:'skill'}));if(j===0)sk.push(Rs('Reset',20,'Next skill.'));});
+    blocks.push({name:'Skills',steps:sk});
+    const d=t.speed[0],dur=Math.min(d.d,6),sp=[];
+    for(let i=1;i<=3;i++){sp.push(W('Sharp start '+i+'/3',dur,'About 80% effort. Quick and fresh, not tiring.',{count:'sprint'}));if(i<3)sp.push(Rs('Walk back',45,'Easy.'));}
+    blocks.push({name:'Sharp starts',steps:sp});
+    return {day,w,lite,title:'Game Primer',sub:'Short and sharp the day before a game. Finish feeling fresh, not tired.',blocks};
+  }
   if(day==='wed'){
-    const s=skillAt((w-1)*2+2);
+    const s=skillAt(rot*2+2);
     blocks.push({name:'Skill',steps:[W(s[0],b.skillT,s[1],{count:'skill'})]});
     if(t.skip)blocks.push({name:'Skipping',steps:skip(Math.max(3,Math.round(6*b.cond)))});
     const c=circuit(C_SLOTS,2,'Body armour');c.steps[0]=Rs('Get down for the floor work',20,'Find a soft spot.');
@@ -201,7 +227,7 @@ function flatSteps(sess){const out=[];sess.blocks.forEach(b=>b.steps.forEach(s=>
 function estMin(sess){let t=0;flatSteps(sess).forEach(s=>{t+=s.k==='reps'?(s.unit==='metres'?(s.reps>25?60:35):s.reps*(s.unit.startsWith('each')?6:3)+5):s.dur;});return Math.round(t/60);}
 
 /* ---------------- Scoring ---------------- */
-const MEDALS=()=>{const t=T(),wk=t.week.toLowerCase();return [
+const MEDALS=(N)=>{N=N||8;const t=T(),wk=(inSeason()?'week':t.week).toLowerCase();return [
   {id:'first',n:'First Session',d:'Finish your first session',m:'1',ok:s=>s.sessions>=1},
   {id:'mixer',n:'Mixed It Up',d:'Swap an exercise',m:'⇄',ok:s=>s.swaps>=1},
   {id:'speed',n:'Speed Demon',d:'Run 40 sprints',m:'40',ok:s=>s.sprints>=40},
@@ -211,13 +237,14 @@ const MEDALS=()=>{const t=T(),wk=t.week.toLowerCase();return [
   {id:'full',n:'Full Week',d:'Club, bonus and both sessions in one '+wk,m:'4',ok:s=>s.fullWeek},
   {id:'run',n:'Winning Run',d:'Win 3 '+plural(wk)+' in a row',m:'3W',ok:s=>s.bestRun>=3},
   {id:'half',n:'Halfway',d:'Win '+wk+' 4',m:'4',ok:s=>s.won4},
-  {id:'flag',n:t.title,d:'Win all 8 '+plural(wk),m:'8',ok:s=>s.wins>=8}
+  {id:'flag',n:t.title,d:'Win all '+N+' '+plural(wk),m:String(N),ok:s=>s.wins>=N}
 ];};
 const LEVEL_FR=[0,.1,.25,.4,.58,.76,.93];
 function logKey(w,day){return w+'-'+day;}
 function isDone(w,day){return !!S.log[logKey(w,day)];}
 function weekResult(w){const a=isDone(w,'sat'),b=isDone(w,'sun');return a&&b?'W':(a||b?'D':'');}
 function derived(){
+  if(inSeason())return derivedIn();
   const t=T();
   let big=0,small=0,wins=0,run=0,best=0,fullWeek=false,sessions=0;
   for(let w=1;w<=8;w++){
@@ -227,7 +254,7 @@ function derived(){
     if(['mon','wed','sat','sun'].every(d=>isDone(w,d)))fullWeek=true;
   }
   const st=Object.assign({},S.stats,{sessions,wins,bestRun:best,fullWeek,won4:weekResult(4)==='W'});
-  const ML=MEDALS(),medals=ML.filter(m=>m.ok(st)).map(m=>m.id);
+  const ML=MEDALS(8),medals=ML.filter(m=>m.ok(st)).map(m=>m.id);
   small+=medals.length;
   const pts=big*t.bigP+small*t.smallP,max=16*t.bigP+(16+ML.length)*t.smallP;
   const LV=t.levels.map((n,i)=>[Math.round(LEVEL_FR[i]*max),n]);
@@ -235,6 +262,74 @@ function derived(){
   const nextL=LV[li+1];
   const frac=nextL?(pts-LV[li][0])/(nextL[0]-LV[li][0]):1;
   return {big,small,pts,medals,level:LV[li][1],next:nextL,frac,wins,sessions};
+}
+
+/* ---------------- In-season ----------------
+   Built around the team's own schedule. Basis: one strength session a week maintains pre-season strength
+   and speed in-season (Ronnestad 2011); keep hard work out of the 48 h before a game; easy recovery the day
+   after; at least 2 rest days; weekly organised sport hours no more than age in years. */
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const inSeason=()=>!!(S.season&&S.season.on&&S.season.start);
+const APP_TYPES={strength:1,recovery:1,primer:1,skills:1};
+function iDate(w,dow){return addDays(parseD(S.season.start),(w-1)*7+dow);}
+function seasonWeek(){const t=new Date();t.setHours(0,0,0,0);const diff=Math.floor((t-parseD(S.season.start))/864e5);return Math.min(S.season.weeks,Math.max(1,Math.floor(diff/7)+1));}
+let viewIWeek=1;
+function sessIn(type,opt){return buildSession(type==='skills'?'wed':type,1,Object.assign({rot:viewIWeek-1},opt||{}));}
+function planWeek(){
+  const sc=S.season,b=band(),G=sc.game,notes=[];
+  const plan=Array.from({length:7},(_,d)=>({dow:d,type:'rest'}));
+  sc.train.forEach(d=>{plan[d].type='team';});
+  if(G>=0)plan[G].type='game';
+  const free=d=>plan[d].type==='rest';
+  const until=d=>G<0?7:((G-d+7)%7);
+  if(G>=0&&free((G+1)%7))plan[(G+1)%7]={dow:(G+1)%7,type:'recovery',opt:true};
+  const want=b.id==='senior'?2:1;let placed=[];
+  for(let n=0;n<want;n++){
+    const c=[0,1,2,3,4,5,6].filter(d=>free(d)&&until(d)>=2&&!placed.some(x=>Math.abs(x-d)<=1||Math.abs(x-d)>=6));
+    c.sort((a,z)=>until(z)-until(a)||a-z);
+    if(c.length){plan[c[0]]={dow:c[0],type:'strength'};placed.push(c[0]);}
+  }
+  if(!placed.length)notes.push('No free day at least 2 days before the game, so there\'s no strength top-up this week. Team training will keep you going.');
+  if(G>=0&&free((G+6)%7))plan[(G+6)%7]={dow:(G+6)%7,type:'primer',opt:true};
+  else{const c=[0,1,2,3,4,5,6].find(d=>free(d)&&until(d)>=2);if(c!=null)plan[c]={dow:c,type:'skills',opt:true};}
+  /* At least 2 easy days (rest or recovery). */
+  const easy=()=>plan.filter(x=>x.type==='rest'||x.type==='recovery').length;
+  const drop=(types,why)=>{for(const ty of types){if(easy()>=2&&!why.load)return;const x=plan.find(q=>q.type===ty);if(x){notes.push(why.msg(x));plan[x.dow]={dow:x.dow,type:'rest'};}}};
+  if(easy()<2)drop(['skills','primer'],{msg:x=>'Dropped the '+DAYL[x.dow]+' bonus session so you still get 2 easy days.'});
+  if(easy()<2&&placed.length>1){const x=plan[placed[1]];notes.push('Only one strength top-up this week so you still get 2 easy days.');plan[x.dow]={dow:x.dow,type:'rest'};}
+  /* Weekly load cap: organised sport hours no more than age in years. */
+  const cap=age()*60;
+  const load=()=>plan.reduce((a,x)=>a+(x.type==='team'?sc.trainMin:x.type==='game'?sc.gameMin:APP_TYPES[x.type]?estMin(sessIn(x.type)):0),0);
+  for(const ty of ['skills','primer','strength']){
+    if(load()<=cap)break;
+    const xs=plan.filter(q=>q.type===ty);const x=xs[xs.length-1];
+    if(x&&!(ty==='strength'&&plan.filter(q=>q.type==='strength').length<2)){notes.push('Dropped the '+DAYL[x.dow]+' session to keep your week under '+age()+' hours.');plan[x.dow]={dow:x.dow,type:'rest'};}
+  }
+  if(load()>cap)notes.push('Team training and games already add up to more than '+age()+' hours a week, the guide for age '+age()+'. Worth a chat with your coach about rest.');
+  return {plan,notes,load:load(),cap};
+}
+const TYPE_NAME={team:'Team training',game:'Game day',strength:'Strength Top-Up',recovery:'Recovery',primer:'Game Primer',skills:'Skills + Body Armour',rest:'Rest'};
+function iKey(w,dow){return w+'-'+dow;}
+function iDone(w,dow){return !!S.ilog[iKey(w,dow)];}
+function iResult(w,plan){const st=plan.filter(x=>x.type==='strength');const any=plan.some(x=>x.type!=='rest'&&iDone(w,x.dow));if(st.length&&st.every(x=>iDone(w,x.dow)))return 'W';return any?'D':'';}
+function derivedIn(){
+  const t=T(),{plan}=planWeek(),N=S.season.weeks;
+  let big=0,small=0,wins=0,run=0,best=0,fullWeek=false,sessions=0;
+  for(let w=1;w<=N;w++){
+    plan.forEach(x=>{if(x.type!=='rest'&&iDone(w,x.dow)){if(x.type==='strength')big++;else small++;if(APP_TYPES[x.type])sessions++;}});
+    const r=iResult(w,plan);if(r==='W'){wins++;run++;best=Math.max(best,run);}else run=0;
+    if(plan.every(x=>x.type==='rest'||iDone(w,x.dow)))fullWeek=fullWeek||plan.some(x=>x.type!=='rest'&&iDone(w,x.dow));
+  }
+  const st=Object.assign({},S.stats,{sessions,wins,bestRun:best,fullWeek,won4:iResult(4,plan)==='W'});
+  const ML=MEDALS(N),medals=ML.filter(m=>m.ok(st)).map(m=>m.id);
+  small+=medals.length;
+  const nBig=Math.max(1,plan.filter(x=>x.type==='strength').length),nSmall=plan.filter(x=>x.type!=='rest'&&x.type!=='strength').length;
+  const pts=big*t.bigP+small*t.smallP,max=N*(nBig*t.bigP+nSmall*t.smallP)+ML.length*t.smallP;
+  const LV=t.levels.map((n,i)=>[Math.round(LEVEL_FR[i]*max),n]);
+  let li=0;LV.forEach((l,i)=>{if(pts>=l[0])li=i;});
+  const nextL=LV[li+1],frac=nextL?(pts-LV[li][0])/(nextL[0]-LV[li][0]):1;
+  return {big,small,pts,medals,level:LV[li][1],next:nextL,frac,wins,sessions,weeks:N};
 }
 
 /* ---------------- Native (Android app) bridge ---------------- */
@@ -359,6 +454,7 @@ const IC={
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><ellipse cx="12" cy="12" rx="8" ry="10"/><path d="M12 2v20M4.5 8h15M4.5 16h15" opacity=".45"/></svg>',
   drills:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg>',
   medals:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 2l2 6M16 2l-2 6"/><circle cx="12" cy="15" r="6"/></svg>',
+  team:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.6c.6-.2 1.3-.3 2-.3 2.5 0 4.5 2 4.5 4.5"/></svg>',
   locker:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 21V8a6 6 0 0112 0v13M6 21h12M10 12h4"/></svg>',
   play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>',
   pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>',
@@ -381,13 +477,14 @@ function render(){
   const D=derived();
   const vk=(detail||'')+tab+viewWeek+S.sport,anim=vk!==lastView;lastView=vk;
   let html='<div class="app'+(anim?' enter':'')+'">';
-  if(detail)html+=detailView(detail);
-  else if(tab==='home')html+=board(D)+homeView(D);
+  if(detail)html+=(detail.startsWith('i:')?detailIn(+detail.slice(2)):detailView(detail));
+  else if(tab==='home')html+=board(D)+(inSeason()?homeIn(D):homeView(D));
   else if(tab==='drills')html+=drillsView();
+  else if(tab==='team')html+=window.TeamUI.view();
   else if(tab==='medals')html+=medalsView(D);
   else html+=lockerView();
   html+='</div>';
-  if(!detail)html+=navBar();
+  if(!detail&&!(tab==='team'&&window.TeamUI.inDetail()))html+=navBar();
   root.innerHTML=html;
   if(!sheetOpen){if(!S.onboarded||!S.sport)openOnboard();else if(!S.age)openAbout(true);}
 }
@@ -397,7 +494,7 @@ function board(D){
   const small=t.afl?'Season score':`${D.big} ${D.big===1?t.bigW:plural(t.bigW)} · ${D.small} ${D.small===1?t.smallW:plural(t.smallW)}`;
   return `<div class="board">
     <div class="jumper">${jumperSVG()}<b class="num">${esc(S.num||'—')}</b></div>
-    <div class="who"><div class="disp">${esc(name)}</div><small>Pre-season ${yr}</small></div>
+    <div class="who"><div class="disp">${esc(name)}</div><small>${inSeason()?'In-season '+parseD(S.season.start).getFullYear():'Pre-season '+yr}</small></div>
     <div class="score"><div class="disp num">${score}</div><small>${esc(small)}</small></div>
     <div class="lvl"><b>${D.level}</b><div class="bar"><i style="width:${Math.round(D.frac*100)}%"></i></div><span class="num">${D.next?(D.next[0]-D.pts)+' pts to '+D.next[1]:'Top rank!'}</span></div>
   </div>`;
@@ -434,11 +531,92 @@ function homeView(D){
   <div class="sect"><h3>${t.table}</h3><small>${D.wins} of 8 won</small></div>
   <div class="ladder">${[1,2,3,4,5,6,7,8].map(r=>{const res=weekResult(r);return `<button class="rd ${res} ${r===cw?'cur':''} ${r===w?'sel':''}" data-week="${r}" aria-label="${wk} ${r}"><small>${wk.slice(0,2).toUpperCase()}</small><b class="num">${r}</b><small>${res||'·'}</small></button>`;}).join('')}</div>
   <div class="tip"><span>${ballIcon()}</span><div><b>${PHASES[p].name}:</b> ${PHASES[p].note} Win a ${wk.toLowerCase()} by finishing Saturday and Sunday. Each one is a ${t.bigW.toLowerCase()} (${t.bigP} points). Club training, the Wednesday bonus and medals are a ${t.smallW.toLowerCase()} (${t.smallP} point).</div></div>
-  <div class="tip"><span>${IC.shield}</span><div><b>Train smart:</b> ${esc(tip)}</div></div>`;
+  <div class="tip"><span>${IC.shield}</span><div><b>Train smart:</b> ${esc(tip)}</div></div>
+  <div class="tip" style="background:var(--stand);border-color:var(--line)"><span>${ballIcon()}</span><div><b>Season starting?</b> Switch to in-season training, built around your team's training and game days. <button class="link" data-season-setup>Set up my season</button></div></div>`;
+}
+function nextMonday(){const t=new Date();t.setHours(0,0,0,0);const d=(8-((t.getDay()+6)%7))%7||7;return addDays(t,d);}
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function homeIn(D){
+  const t=T(),w=viewIWeek,cw=seasonWeek(),{plan,notes,load,cap}=planWeek();
+  const today=new Date();today.setHours(0,0,0,0);
+  const apps=plan.filter(x=>APP_TYPES[x.type]&&!iDone(w,x.dow));
+  const upcoming=apps.filter(x=>w>cw||(w===cw&&iDate(w,x.dow)>=today));
+  const pick=upcoming.find(x=>x.type==='strength')||upcoming[0];
+  let hero;
+  if(pick){const s=sessIn(pick.type);
+    hero=`<div class="hero"><div class="tag">${nm()?esc(nm())+', you\'re up':'Next up'} · ${fmt(iDate(w,pick.dow))}</div><h2 class="disp">${s.title}</h2><p>${s.sub}</p>
+      <div class="chips"><span class="chip">~${estMin(s)} min</span>${pick.opt?'<span class="chip">Optional</span>':''}</div>
+      <button class="kick" data-iopen="${pick.dow}">${ballIcon()} Let's go</button></div>`;}
+  else hero=`<div class="hero"><div class="tag">Week ${w}</div><h2 class="disp">${iResult(w,plan)==='W'?'Week won!':'All set'}</h2><p>${w<S.season.weeks?'Week '+(w+1)+' starts '+fmt(iDate(w+1,0))+'.':'That\'s the season. '+t.title+'!'}</p>${w<S.season.weeks?`<button class="kick" data-iweek="${w+1}">Go to week ${w+1}</button>`:''}</div>`;
+  const pillFor=(x,done)=>done?'<span class="pill done">Done</span>':x.type==='team'||x.type==='game'?'<span class="pill todo">Tick off</span>':x.opt?'<span class="pill opt">Optional</span>':'<span class="pill todo">To play</span>';
+  const sub=x=>x.type==='team'?S.season.trainMin+' min with your team':x.type==='game'?'Play your best. Tick it off after.':x.type==='rest'?'Recover and grow':'~'+estMin(sessIn(x.type))+' min'+(x.type==='strength'?' · scores a '+t.bigW.toLowerCase():'');
+  return `
+  <div class="round"><h1 class="disp">Week <em class="num">${w}</em></h1><div class="blk">of ${S.season.weeks}<b>In-season</b></div></div>
+  ${w!==cw?`<div class="muted" style="margin:-4px 2px 10px;font-size:14px">Viewing week ${w}. <button class="link" data-iweek="${cw}">Back to this week</button></div>`:''}
+  ${hero}
+  <div class="sect"><h3>This week</h3><small>${fmt(iDate(w,0))} – ${fmt(iDate(w,6))}</small></div>
+  <div class="fixture">${plan.map(x=>{const dd=iDate(w,x.dow),done=x.type!=='rest'&&iDone(w,x.dow);
+    if(x.type==='rest')return `<div class="fx" style="opacity:.55;padding:8px 12px"><div class="day" style="padding:4px 0"><b style="font-size:17px">${DAYS[x.dow]}</b></div><div><div class="t" style="font-size:18px">Rest</div></div><span></span></div>`;
+    return `<button class="fx ${done?'isdone':''}" data-iopen="${x.dow}"><div class="day"><b>${DAYS[x.dow]}</b><small>${dd.getDate()} ${dd.toLocaleDateString('en-AU',{month:'short'})}</small></div><div><div class="t">${TYPE_NAME[x.type]}</div><div class="s">${sub(x)}</div></div>${pillFor(x,done)}</button>`;}).join('')}</div>
+  ${notes.map(n=>`<div class="tip"><span>${IC.shield}</span><div>${esc(n)}</div></div>`).join('')}
+  <div class="sect"><h3>Season</h3><small>${D.wins} of ${S.season.weeks} weeks won</small></div>
+  <div class="ladder">${Array.from({length:S.season.weeks},(_,i)=>i+1).map(r=>{const res=iResult(r,plan);return `<button class="rd ${res} ${r===cw?'cur':''} ${r===w?'sel':''}" data-iweek="${r}" aria-label="Week ${r}"><small>WK</small><b class="num">${r}</b><small>${res||'·'}</small></button>`;}).join('')}</div>
+  <div class="tip"><span>${ballIcon()}</span><div><b>In-season:</b> your app sessions fit around team training and games. Win a week by doing your Strength Top-Up (a ${t.bigW.toLowerCase()}, ${t.bigP} points). Team training, games and the other sessions are a ${t.smallW.toLowerCase()} (${t.smallP} point). This week: ~${Math.round(load/6)/10} of ${age()} hours.</div></div>
+  <div style="text-align:center;margin-top:12px"><button class="link" data-season-setup>Change team schedule</button></div>`;
+}
+function detailIn(dow){
+  const t=T(),w=viewIWeek,{plan}=planWeek(),x=plan[dow],dd=iDate(w,dow),done=iDone(w,dow);
+  const head=`<button class="back" data-back>← Weeks</button>`;
+  if(x.type==='team'||x.type==='game'){
+    return head+`<div class="dhead"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">Week ${w} · ${fmt(dd)}</div><h2 class="disp">${TYPE_NAME[x.type]}</h2><p>${x.type==='game'?'Warm up properly, play hard, and cool down after. Tick it off for a '+t.smallW.toLowerCase()+'.':'Training with your team counts. Tick it off for a '+t.smallW.toLowerCase()+'.'}</p></div>
+    ${x.type==='game'?`<div class="tip"><span>${IC.shield}</span><div><b>Any knock to the head?</b> Stop, no more sport that day, and see a doctor before returning.</div></div>`:''}
+    <div class="sticky"><div class="in"><button class="big" data-imark="${dow}">${done?'Done ✓ (tap to undo)':x.type==='game'?'I played today':'I trained today'}</button></div></div>`;
+  }
+  if(x.type==='rest')return head+`<div class="dhead"><h2 class="disp">Rest day</h2><p>Rest is when your body gets stronger.</p></div>`;
+  const s=sessIn(x.type);
+  return head+`<div class="dhead"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">Week ${w} · ${fmt(dd)} · ~${estMin(s)} min</div><h2 class="disp">${s.title}</h2><p>${s.sub}</p></div>
+  ${blocksHTML(s,1)}
+  ${done?`<div class="tip"><span>${IC.tick}</span><div><b>Done this week.</b> <button class="link" data-iundo="${dow}">Undo</button></div></div>`:''}
+  <div style="text-align:center;margin-top:14px">${done?'':`<button class="link" data-imark="${dow}">I did this without the app</button>`}</div>
+  <div style="height:90px"></div>
+  <div class="sticky"><div class="in"><button class="big" data-istart="${dow}">${done?'Run it again':'Kick off'}</button></div></div>`;
+}
+function blocksHTML(s,w){
+  let h='';
+  s.blocks.forEach(b=>{h+=`<div class="blockhead"><h4>${b.name}</h4><small>${blockSummary(b)}</small></div>`;h+=b.slots?`<div class="card">${b.slots.map(sl=>slotRow(sl,w)).join('')}</div>`:`<div class="card">${compactSteps(b.steps)}</div>`;});
+  return h;
+}
+function openSeasonSetup(){
+  const sc=S.season;
+  let st={start:sc.start||iso(nextMonday()),weeks:sc.weeks||18,train:(sc.train||[]).slice(),game:sc.game==null?5:sc.game,trainMin:sc.trainMin||90,gameMin:sc.gameMin||60};
+  const chips=(sel,attr,extra)=>`<div class="dchips">${DAYS.map((d,i)=>`<button class="dchip ${sel(i)?'on':''}" ${attr}="${i}">${d}</button>`).join('')}</div>${extra||''}`;
+  const draw=()=>`<h3>Your season</h3><p>Tell us when your team trains and plays. The app fits your sessions around them, with rest before games and recovery after.</p>
+    <div class="field"><label>Team training days</label>${chips(i=>st.train.includes(i),'data-st')}</div>
+    <div class="field"><label>Game day</label>${chips(i=>st.game===i,'data-sg',`<button class="dchip ${st.game<0?'on':''}" data-sg="-1" style="margin-top:6px;width:100%">No games yet</button>`)}</div>
+    <div class="field"><label>Team training length</label><div class="ctl" style="justify-content:flex-start"><button class="step" data-sm="-15">−</button><div class="amt num">${st.trainMin}<small>min</small></div><button class="step" data-sm="15">+</button></div></div>
+    <div class="field"><label>Game length (your playing time)</label><div class="ctl" style="justify-content:flex-start"><button class="step" data-gm="-10">−</button><div class="amt num">${st.gameMin}<small>min</small></div><button class="step" data-gm="10">+</button></div></div>
+    <div class="field"><label for="s-start">Season starts (a Monday)</label><input id="s-start" type="date" value="${st.start}"></div>
+    <div class="field"><label>Season length</label><div class="ctl" style="justify-content:flex-start"><button class="step" data-wk="-1">−</button><div class="amt num">${st.weeks}<small>weeks</small></div><button class="step" data-wk="1">+</button></div></div>
+    <button class="big" data-save style="margin-top:10px">${sc.on?'Save schedule':'Start the season'}</button>
+    ${sc.on?'<div style="text-align:center;margin-top:8px"><button class="link" data-backpre>Switch back to pre-season</button></div>':''}`;
+  const redraw=()=>{const el=document.querySelector('#scrim .sheet');const y=el.scrollTop;el.innerHTML='<div class="grab"></div>'+draw();el.scrollTop=y;};
+  sheet(draw(),e=>{
+    const inp=document.getElementById('s-start');if(inp&&inp.value)st.start=inp.value;
+    const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+    if(d.st!=null){const i=+d.st;st.train=st.train.includes(i)?st.train.filter(x=>x!==i):st.train.concat(i).sort();if(st.game===i)st.game=-1;redraw();}
+    else if(d.sg!=null){st.game=+d.sg;st.train=st.train.filter(x=>x!==st.game);redraw();}
+    else if(d.sm){st.trainMin=Math.max(30,Math.min(180,st.trainMin+(+d.sm)));redraw();}
+    else if(d.gm){st.gameMin=Math.max(20,Math.min(120,st.gameMin+(+d.gm)));redraw();}
+    else if(d.wk){st.weeks=Math.max(4,Math.min(40,st.weeks+(+d.wk)));redraw();}
+    else if(d.backpre!=null){S.season.on=false;save();closeSheet();tab='home';detail=null;render();toast('Back to pre-season');}
+    else if(d.save!=null){
+      const sd=parseD(st.start);if((sd.getDay()+6)%7!==0){st.start=iso(addDays(sd,-((sd.getDay()+6)%7)));}
+      S.season=Object.assign({},S.season,st,{on:true});save();viewIWeek=seasonWeek();closeSheet();tab='home';detail=null;render();toast('Season mode on');}
+  });
 }
 function navBar(){
   const b=(id,l)=>`<button class="${tab===id?'on':''}" data-tab="${id}">${IC[id]}<span>${l}</span></button>`;
-  return `<nav class="nav"><div class="in">${b('home',plural(T().week))}${b('drills','Drills')}${b('medals','Medals')}${b('locker','Locker')}</div></nav>`;
+  return `<nav class="nav"><div class="in">${b('home',inSeason()?'Weeks':plural(T().week))}${b('drills','Drills')}${b('team','Team')}${b('medals','Medals')}${b('locker','Locker')}</div></nav>`;
 }
 function slotRow(slot,w){
   const k=exOf(slot),e=EX[k],a=amountFor(slot,w),L=amtLabel(e,a);
@@ -454,12 +632,7 @@ function detailView(day){
     <div class="sticky"><div class="in"><button class="big" data-markmon>${done?'Trained ✓ (tap to undo)':'I trained today'}</button></div></div>`;
   }
   const s=buildSession(day,w);
-  let blocks='';
-  s.blocks.forEach(b=>{
-    blocks+=`<div class="blockhead"><h4>${b.name}</h4><small>${blockSummary(b)}</small></div>`;
-    if(b.slots)blocks+=`<div class="card">${b.slots.map(sl=>slotRow(sl,w)).join('')}</div>`;
-    else blocks+=`<div class="card">${compactSteps(b.steps)}</div>`;
-  });
+  const blocks=blocksHTML(s,w);
   const modes=[['field',t.condLabel],['swim','Swim'],['ride','Ride']];
   return `<button class="back" data-back>← ${plural(wk)}</button>
   <div class="dhead"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">${wk} ${w} · ${fmt(dd)} · ~${estMin(s)} min</div><h2 class="disp">${s.title}</h2><p>${s.sub}</p></div>
@@ -499,7 +672,7 @@ function drillsView(){
   <div style="text-align:center;margin-top:16px"><button class="link" data-resetdrills>Put all drills back to the original plan</button></div>`;
 }
 function medalsView(D){
-  const st=S.stats,ML=MEDALS();
+  const st=S.stats,ML=MEDALS(D.weeks||8);
   return `<div class="dhead" style="margin-top:6px"><div class="muted" style="font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:13px">${D.medals.length} of ${ML.length} won · each one is a ${T().smallW.toLowerCase()}</div><h2 class="disp">Medals</h2></div>
   <div class="medals" style="margin-top:14px">${ML.map(m=>`<div class="medal ${D.medals.includes(m.id)?'on':''}"><div class="m">${m.m}</div><b>${esc(m.n)}</b><small>${esc(m.d)}</small></div>`).join('')}</div>
   <div class="sect"><h3>Season stats</h3></div>
@@ -509,7 +682,7 @@ function medalsView(D){
     <div class="simple"><span>Conditioning efforts</span><span class="num">${st.cond}</span></div>
     <div class="simple"><span>Circuit sets</span><span class="num">${st.sets}</span></div>
     <div class="simple"><span>Skill blocks</span><span class="num">${st.skills}</span></div>
-    <div class="simple"><span>${plural(T().week)} won</span><span class="num">${D.wins} / 8</span></div>
+    <div class="simple"><span>${inSeason()?'Weeks':plural(T().week)} won</span><span class="num">${D.wins} / ${D.weeks||8}</span></div>
   </div>`;
 }
 function weeklyMinutes(w){return ['sat','sun','wed'].reduce((a,d)=>a+estMin(buildSession(d,w)),0);}
@@ -517,7 +690,7 @@ function lockerView(){
   const r=S.rest,t=T(),b=band(),a=age();
   const restRow=(k,l)=>`<div class="row"><div><div class="n">${l}</div></div><div class="ctl"><button class="step" data-rest="${k}" data-d="-5" aria-label="Less">−</button><div class="amt num">${r[k]}<small>sec</small></div><button class="step" data-rest="${k}" data-d="5" aria-label="More">+</button></div></div>`;
   const tg=(k,l,h)=>`<div class="tog"><span>${l}${h?`<div class="hint">${h}</div>`:''}</span><button class="sw ${S[k]?'on':''}" data-tog="${k}" role="switch" aria-checked="${S[k]}" aria-label="${l}"></button></div>`;
-  const wm=weeklyMinutes(viewWeek);
+  const wm=inSeason()?planWeek().load:weeklyMinutes(viewWeek);
   return `<div class="dhead" style="margin-top:6px"><h2 class="disp">Locker</h2><p>Your sport, your body, your settings.</p></div>
   <div class="blockhead"><h4>Athlete</h4></div>
   <div class="card">
@@ -532,10 +705,13 @@ function lockerView(){
     <div class="field"><label for="f-num">Jumper number</label><input id="f-num" value="${esc(S.num)}" inputmode="numeric" maxlength="2"></div>
     <div class="field"><label for="f-start">${t.week} 1 starts (a Monday)</label><input id="f-start" type="date" value="${S.start}"></div>
   </div>
+  <div class="blockhead"><h4>Season</h4></div>
+  <div class="card"><div class="seg" style="margin:6px 0 4px"><button class="${inSeason()?'':'on'}" data-mode-pre>Pre-season</button><button class="${inSeason()?'on':''}" data-season-setup>In-season</button></div>
+    ${inSeason()?`<div class="simple"><span>Team training</span><span>${S.season.train.map(d=>DAYS[d]).join(', ')||'None'}</span></div><div class="simple"><span>Game day</span><span>${S.season.game<0?'None':DAYS[S.season.game]}</span></div><div style="text-align:center"><button class="link" data-season-setup>Change team schedule</button></div>`:''}</div>
   <div class="blockhead"><h4>Training load</h4></div>
-  <div class="card"><div class="simple"><span>App sessions this ${t.week.toLowerCase()}</span><span class="num">~${wm} min</span></div>
+  <div class="card"><div class="simple"><span>${inSeason()?'Team + app this week':'App sessions this '+t.week.toLowerCase()}</span><span class="num">~${Math.round(wm/6)/10} hours</span></div>
     <div class="simple"><span>Weekly limit for age ${a} (all organised sport)</span><span class="num">${a} hours</span></div>
-    <div class="simple"><span>Rest days</span><span>Tue, Thu, Fri</span></div></div>
+    <div class="simple"><span>Rest days</span><span>${inSeason()?planWeek().plan.filter(x=>x.type==='rest'||x.type==='recovery').map(x=>DAYS[x.dow]).join(', '):'Tue, Thu, Fri'}</span></div></div>
   <div class="blockhead"><h4>Train safe</h4></div>
   <div class="card safe">${SAFE.concat(t.tips.map(x=>[t.name,x])).map(([h,x])=>`<div class="simple"><b>${esc(h)}</b><span>${esc(x)}</span></div>`).join('')}</div>
   <div class="blockhead"><h4>Timer</h4></div>
@@ -584,7 +760,7 @@ function openOnboard(){openSports(false);}
 /* About you: age, experience, growth spurt and the parent check. */
 function openAbout(isUpdate){
   const t=T();let a=S.age||0,exp=S.exp||'some',growth=!!S.growth;
-  const body=()=>`<h3>${isUpdate?'New: about you':'About you'}</h3><p>${isUpdate?'Pre-Season Bomber now sets every session by age, so the work is safe and right for your body.':'This sets your program so it\'s safe and right for your body.'}</p>
+  const body=()=>`<h3>${isUpdate?'New: about you':'About you'}</h3><p>${isUpdate?'Full Season now sets every session by age, so the work is safe and right for your body.':'This sets your program so it\'s safe and right for your body.'}</p>
   ${isUpdate?'':`<div class="field"><label for="o-name">Your name</label><input id="o-name" maxlength="16" autocomplete="off" placeholder="First name" value="${esc(S.name)}"></div>
   <div class="field"><label for="o-num">Jumper number</label><input id="o-num" inputmode="numeric" maxlength="2" placeholder="e.g. 9" value="${esc(S.num)}"></div>`}
   <div class="field"><label>Age</label><div class="ctl" style="justify-content:flex-start"><button class="step" data-oage="-1" aria-label="Younger">−</button><div class="amt num" id="o-age">${a||'?'}<small>years</small></div><button class="step" data-oage="1" aria-label="Older">+</button><span class="hint" id="o-band" style="margin-left:8px">${a?bandFor(a).stage:'Ages 6–18'}</span></div></div>
@@ -622,8 +798,18 @@ function toast(t){const o=document.querySelector('.toast');if(o)o.remove();const
 root.addEventListener('click',e=>{
   const t=e.target.closest('button');if(!t)return;
   const d=t.dataset;
+  if(d.t){window.TeamUI.click(t);return;}
   if(d.tab){tab=d.tab;detail=null;render();scrollTo(0,0);}
   else if(d.open){detail=d.open;render();scrollTo(0,0);}
+  else if(d.iopen!=null){detail='i:'+d.iopen;render();scrollTo(0,0);}
+  else if(d.iweek){viewIWeek=+d.iweek;detail=null;tab='home';render();}
+  else if(d.istart!=null){const x=planWeek().plan[+d.istart];openReady({dow:+d.istart,type:x.type});}
+  else if(d.imark!=null){const dow=+d.imark,x=planWeek().plan[dow];
+    if(x.type==='team'||x.type==='game'){if(iDone(viewIWeek,dow))delete S.ilog[iKey(viewIWeek,dow)];else{S.ilog[iKey(viewIWeek,dow)]={at:Date.now(),type:x.type};toast(T().smallW+'! +'+T().smallP+' point');}save();render();}
+    else completeIn(dow,null,true);}
+  else if(d.iundo!=null){confirmSheet('Undo this session?','It comes off your score for week '+viewIWeek+'.','Undo it',()=>{delete S.ilog[iKey(viewIWeek,+d.iundo)];save();render();});}
+  else if(d.seasonSetup!=null){openSeasonSetup();}
+  else if(d.modePre!=null){if(inSeason()){S.season.on=false;save();render();toast('Back to pre-season');}}
   else if(d.back!==undefined){detail=null;render();scrollTo(0,0);}
   else if(d.week){viewWeek=+d.week;detail=null;tab='home';render();}
   else if(d.swap){openSwap(d.swap);}
@@ -654,9 +840,10 @@ root.addEventListener('change',e=>{
 /* ---------------- Player ---------------- */
 let P=null,timerId=null;
 function startPlayer(day,lite){
-  const sess=buildSession(day,viewWeek,{lite});
+  const ref=typeof day==='object'?day:null;
+  const sess=ref?sessIn(ref.type,{lite}):buildSession(day,viewWeek,{lite});
   const steps=[{k:'ready',name:'Get ready',dur:5,cue:'First up: '+firstWork(sess),block:sess.blocks[0].name}].concat(flatSteps(sess));
-  P={day,w:viewWeek,lite,sess,steps,i:0,start:performance.now(),paused:false,pausedAt:0,acc:0,lastBeep:null,counts:{sets:0,sprints:0,cond:0,skills:0}};
+  P={day,ref,w:ref?viewIWeek:viewWeek,lite,sess,steps,i:0,start:performance.now(),paused:false,pausedAt:0,acc:0,lastBeep:null,counts:{sets:0,sprints:0,cond:0,skills:0}};
   audio();wake(true);prepNotifs();
   const el=document.createElement('div');el.className='player';el.id='player';document.body.appendChild(el);
   el.addEventListener('click',playerClick);
@@ -765,7 +952,7 @@ function finishPlayer(){
   const p=P;cancelNotifs();clearInterval(timerId);timerId=null;wake(false);
   const el=document.getElementById('player');if(el)el.remove();
   P=null;
-  complete(p.day,p.counts,false,p.w,p.lite);
+  if(p.ref)completeIn(p.ref.dow,p.counts,false,p.w,p.lite);else complete(p.day,p.counts,false,p.w,p.lite);
 }
 function complete(day,counts,manual,w,lite){
   w=w||viewWeek;
@@ -774,7 +961,7 @@ function complete(day,counts,manual,w,lite){
   else if(manual){flatSteps(buildSession(day,w)).forEach(x=>{if(x.count==='set')S.stats.sets++;if(x.count==='sprint')S.stats.sprints++;if(x.count==='cond')S.stats.cond++;if(x.count==='skill')S.stats.skills++;});}
   if(!already)S.log[logKey(w,day)]={at:Date.now(),manual:!!manual,lite:!!lite};
   save();
-  const after=derived(),ML=MEDALS();
+  const after=derived(),ML=MEDALS(after.weeks||8);
   const newM=ML.filter(m=>after.medals.includes(m.id)&&!before.medals.includes(m.id));
   const isBig=(day==='sat'||day==='sun');
   const won=resBefore!=='W'&&weekResult(w)==='W';
@@ -792,6 +979,30 @@ function complete(day,counts,manual,w,lite){
     <button class="big" id="finok">Back to the rooms</button>`;
   document.body.appendChild(fin);
   confetti();
+  document.getElementById('finok').onclick=()=>{fin.remove();document.getElementById('confetti').hidden=true;detail=null;tab='home';render();scrollTo(0,0);};
+}
+
+function completeIn(dow,counts,manual,w,lite){
+  w=w||viewIWeek;
+  const t=T(),{plan}=planWeek(),x=plan[dow],before=derived(),already=iDone(w,dow),resBefore=iResult(w,plan);
+  if(counts){['sets','sprints','cond','skills'].forEach(k=>S.stats[k]+=counts[k]);}
+  else if(manual&&APP_TYPES[x.type]){flatSteps(sessIn(x.type)).forEach(q=>{if(q.count==='set')S.stats.sets++;if(q.count==='sprint')S.stats.sprints++;if(q.count==='cond')S.stats.cond++;if(q.count==='skill')S.stats.skills++;});}
+  if(!already)S.ilog[iKey(w,dow)]={at:Date.now(),type:x.type,manual:!!manual,lite:!!lite};
+  save();
+  const after=derived(),ML=MEDALS(after.weeks),newM=ML.filter(m=>after.medals.includes(m.id)&&!before.medals.includes(m.id));
+  const isBig=x.type==='strength',won=resBefore!=='W'&&iResult(w,plan)==='W',word=isBig?t.bigW:t.smallW,pts=isBig?t.bigP:t.smallP;
+  siren();buzz([200,100,200,100,400]);
+  if(S.voice)say(already?'Session done. Great work'+(nm()?', '+nm():'')+'.':word+'! Great work'+(nm()?', '+nm():'')+'.');
+  root.innerHTML='';
+  const fin=document.createElement('div');fin.className='fin';fin.id='fin';
+  fin.innerHTML=`<div class="goal">${already?'Done!':esc(word)+'!'}</div>
+    <div class="sub">${already?'Extra session':'+'+pts+(pts===1?' point':' points')}</div>
+    ${won&&!already?`<p style="color:var(--chalk);font-weight:700;font-size:18px">Week ${w} won!</p>`:''}
+    ${nm()?`<p style="color:var(--chalk);font-family:var(--display);font-size:26px;font-weight:800;text-transform:uppercase;margin:12px 0 0">Well played, ${esc(nm())}${S.num?' · #'+esc(S.num):''}</p>`:''}
+    <p>Score now <b class="num" style="color:var(--chalk)">${after.pts} pts</b> · ${after.level}</p>
+    ${newM.length?`<div class="newm">${newM.map(m=>`<div class="medal on"><div class="m">${m.m}</div><b>${esc(m.n)}</b><small>New medal · +${t.smallP}</small></div>`).join('')}</div>`:''}
+    <button class="big" id="finok">Back to the rooms</button>`;
+  document.body.appendChild(fin);confetti();
   document.getElementById('finok').onclick=()=>{fin.remove();document.getElementById('confetti').hidden=true;detail=null;tab='home';render();scrollTo(0,0);};
 }
 
@@ -822,7 +1033,9 @@ NP.App.addListener('appStateChange',st=>{if(st.isActive){cancelNotifs();if(P)tic
 
 /* expose for tests */
 window.__app={buildSession,flatSteps,estMin,derived,amountFor,exOf,S:()=>S,setState:o=>{S=migrate(clone(o));save();viewWeek=currentWeek();closeSheet();render();},phaseOf,setWeek:w=>{viewWeek=w;render();},
-  startPlayer,fieldSVG,tab:x=>{tab=x;detail=null;render();},open:d=>{detail=d;render();}};
+  startPlayer,fieldSVG,planWeek,sessIn,derivedIn,openSeasonSetup,setIWeek:w=>{viewIWeek=w;render();},tab:x=>{tab=x;detail=null;render();},open:d=>{detail=d;render();}};
 
+window.__core={S:()=>S,save,render:()=>render(),toast,sheet,closeSheet,confirm:confirmSheet,esc,ballIcon,IC,tab:()=>tab};
+if(inSeason())viewIWeek=seasonWeek();
 render();
 })();

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Pre-Season Bomber</string>
-    <string name="title_activity_main">Pre-Season Bomber</string>
+    <string name="app_name">Full Season</string>
+    <string name="title_activity_main">Full Season</string>
     <string name="package_name">au.com.preseasonbomber.app</string>
     <string name="custom_url_scheme">au.com.preseasonbomber.app</string>
 </resources>

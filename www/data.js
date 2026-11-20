@@ -1,4 +1,4 @@
-/* Pre-Season Bomber: sports, age bands and the exercise library.
+/* Full Season: sports, age bands and the exercise library.
    Safety basis (summarised in the app's "Train safe" screen):
    - Youth resistance training is safe and effective with good technique and supervision
      (NSCA 2009 position statement; 2014 International Consensus, BJSM).

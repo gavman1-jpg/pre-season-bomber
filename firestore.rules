@@ -1,0 +1,87 @@
+rules_version = '2';
+// Full Season team rules.
+// - Everyone signs in anonymously (no emails or personal details).
+// - Join codes can be looked up one at a time, never listed.
+// - Players join as "pending"; only a coach can approve them.
+// - Only approved members and coaches can see the squad, sessions and results.
+// - Players can only write their own result. Coaches manage sessions and members.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function teamPath(t) { return /databases/$(database)/documents/teams/$(t); }
+    function memberPath(t, u) { return /databases/$(database)/documents/teams/$(t)/members/$(u); }
+    function isCoach(t) { return signedIn() && request.auth.uid in get(teamPath(t)).data.coachUids; }
+    function isMember(t) {
+      return signedIn() && exists(memberPath(t, request.auth.uid))
+        && get(memberPath(t, request.auth.uid)).data.status == 'approved';
+    }
+    function str(v, max) { return v is string && v.size() > 0 && v.size() <= max; }
+    function optStr(v, max) { return v is string && v.size() <= max; }
+
+    match /codes/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['teamId'])
+        && request.auth.uid in getAfter(teamPath(request.resource.data.teamId)).data.coachUids;
+      allow update, delete: if false;
+    }
+
+    match /teams/{t} {
+      allow get: if signedIn() && (exists(memberPath(t, request.auth.uid)) || isCoach(t));
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.coachUids == [request.auth.uid]
+        && str(request.resource.data.name, 40)
+        && str(request.resource.data.code, 8)
+        && str(request.resource.data.sport, 20);
+      allow update: if isCoach(t)
+        && request.resource.data.code == resource.data.code
+        && request.resource.data.coachUids.size() > 0;
+      allow delete: if false;
+
+      match /members/{uid} {
+        allow get: if signedIn() && (request.auth.uid == uid || isMember(t) || isCoach(t));
+        allow list: if isMember(t) || isCoach(t);
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['name', 'num', 'status', 'role', 'joined'])
+          && str(request.resource.data.name, 20)
+          && optStr(request.resource.data.num, 3)
+          && (
+            (request.resource.data.status == 'pending' && request.resource.data.role == 'player')
+            || (request.resource.data.status == 'approved' && request.resource.data.role == 'coach'
+                && uid in getAfter(teamPath(t)).data.coachUids)
+          );
+        // Coaches approve and promote. Names and numbers can't be changed by others.
+        allow update: if isCoach(t)
+          && request.resource.data.name == resource.data.name
+          && request.resource.data.num == resource.data.num
+          && request.resource.data.status in ['pending', 'approved']
+          && request.resource.data.role in ['player', 'coach'];
+        allow delete: if signedIn() && (request.auth.uid == uid || isCoach(t));
+      }
+
+      match /sessions/{s} {
+        allow read: if isMember(t) || isCoach(t);
+        allow create, update: if isCoach(t)
+          && str(request.resource.data.title, 60)
+          && optStr(request.resource.data.details, 140)
+          && request.resource.data.type in ['time', 'dist', 'reps', 'level', 'done']
+          && str(request.resource.data.due, 10);
+        allow delete: if isCoach(t);
+
+        match /results/{uid} {
+          allow read: if isMember(t) || isCoach(t);
+          allow create, update: if signedIn() && request.auth.uid == uid
+            && (isMember(t) || isCoach(t))
+            && request.resource.data.keys().hasOnly(['name', 'num', 'value', 'display', 'where', 'at'])
+            && str(request.resource.data.name, 20)
+            && str(request.resource.data.display, 30)
+            && request.resource.data.where in ['team', 'solo'];
+          allow delete: if signedIn() && (request.auth.uid == uid || isCoach(t));
+        }
+      }
+    }
+  }
+}
