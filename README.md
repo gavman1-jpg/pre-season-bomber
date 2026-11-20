@@ -1,4 +1,4 @@
-# Pre-Season Bomber
+# Full Season
 
 An 8-week pre-season training app for young athletes in 12 sports: Aussie Rules, soccer, basketball, netball, cricket, rugby, American football, baseball/softball, volleyball, ice hockey, tennis and field hockey.
 
@@ -10,11 +10,18 @@ Each athlete picks their sport and enters their age, training experience and whe
 
 The weekly shape: club training (Mon), optional Skills + Body Armour bonus (Wed), Speed + Strength (Sat) and Engine + Skills (Sun), with Tue/Thu/Fri as rest days.
 
+### In-season
+When the season starts, switch to **In-season** (Locker, or the card on the home screen) and enter the team's training days, game day, session lengths and season length. Each week the app plans around them:
+- **Strength Top-Up** once a week (twice for ages 15–18) on a free day at least 2 days before the game. One session a week is enough to hold pre-season strength and speed (Rønnestad et al., 2011).
+- **Recovery** the day after the game, and a short **Game Primer** the day before (both optional).
+- Always at least 2 easy days, and total team + app time kept under the age-in-hours guideline. If the team schedule alone goes over, the app says so.
+- Team training and games are ticked off for points. A week is won by doing the Strength Top-Up.
+
 ## Get the app on an Android phone
 1. On the phone, open this repository's **Releases** page (right-hand side on GitHub, or add `/releases/latest` to the repo address).
-2. Tap **Pre-Season-Bomber.apk** to download it.
+2. Tap **Full-Season.apk** to download it.
 3. Open the download and tap **Install**. The first time, Android asks to allow installs from Chrome (or Files): turn that on, go back, and tap Install.
-4. Open **Pre-Season Bomber**, pick your sport, enter your name, number and age, and allow notifications so the timer can alert you with the phone locked.
+4. Open **Full Season**, pick your sport, enter your name, number and age, and allow notifications so the timer can alert you with the phone locked.
 
 ## Updating
 Any change pushed to `main` builds a new APK automatically (Actions tab, about 5 minutes) and adds it to Releases. Install it over the old one: progress is kept.
