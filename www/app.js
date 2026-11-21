@@ -672,7 +672,7 @@ function navBar(){
 }
 function slotRow(slot,w){
   const k=exOf(slot),e=EX[k],a=amountFor(slot,w),L=amtLabel(e,a);
-  return `<div class="row demo-row"><button class="thumb" data-howto="${k}" aria-label="Watch how to do ${e.n}">${window.Demo.svg(k,'demo','14 14 172 129')}<span>How to</span></button><div><div class="n">${e.n}</div><div class="c">${e.cue}</div><button class="swap" data-swap="${slot}">Swap exercise</button></div>
+  return `<div class="row demo-row"><button class="thumb" data-howto="${k}" aria-label="Watch how to do ${e.n}">${window.Demo.svg(k,'demo','20 6 160 120')}<span>How to</span></button><div><div class="n">${e.n}</div><div class="c">${e.cue}</div><button class="swap" data-swap="${slot}">Swap exercise</button></div>
     <div class="ctl"><button class="step" data-adj="${slot}" data-d="-1" aria-label="Less">−</button><div class="amt num">${L.v}<small>${L.u}</small></div><button class="step" data-adj="${slot}" data-d="1" aria-label="More">+</button></div></div>`;
 }
 function detailView(day){
@@ -792,7 +792,7 @@ function openSwap(slot){
   const opts=Object.keys(EX).filter(k=>EX[k].cat===cat&&allowed(k));
   sheet(`<h3>Swap ${CAT[cat]}</h3><p>Pick something new. It works the same muscles. Only exercises right for age ${age()} are shown.</p>
     ${opts.length>1?'<button class="surprise" data-pick="__rand">Surprise me</button>':''}
-    ${opts.map(k=>`<button class="opt optdemo ${k===cur?'cur':''}" data-pick="${k}">${window.Demo.svg(k,'demo','14 14 172 129')}<span><b>${EX[k].n}${k===cur?' · current':''}</b><small>${EX[k].why} ${EX[k].cue}</small></span></button>`).join('')}`,
+    ${opts.map(k=>`<button class="opt optdemo ${k===cur?'cur':''}" data-pick="${k}">${window.Demo.svg(k,'demo','20 6 160 120')}<span><b>${EX[k].n}${k===cur?' · current':''}</b><small>${EX[k].why} ${EX[k].cue}</small></span></button>`).join('')}`,
   e=>{const b=e.target.closest('[data-pick]');if(!b)return;let k=b.dataset.pick;
     if(k==='__rand'){const o=opts.filter(x=>x!==cur);k=o[Math.floor(Math.random()*o.length)];}
     if(k!==cur){S.slots[slotKey(slot)]=k;delete S.adj[slotKey(slot)];S.stats.swaps++;save();toast('Swapped in '+EX[k].n);}
@@ -800,7 +800,7 @@ function openSwap(slot){
 }
 function openHowto(k,onClose){
   const e=EX[k];if(!e)return;
-  sheet(`<div class="howto">${window.Demo.svg(k,'demo big')}</div><h3>${esc(e.n)}</h3><p>${esc(e.cue)}</p>
+  sheet(`<div class="howto">${window.Demo.svg(k,'demo demo-lg')}</div><h3>${esc(e.n)}</h3><p>${esc(e.cue)}</p>
     <div class="tip" style="margin:10px 0"><span>${IC.shield}</span><div><b>Watch for:</b> ${esc(e.safe)}</div></div>
     <p style="font-size:13.5px">${esc(e.why)}</p><button class="big" data-close style="margin-top:12px">Got it</button>`,
   ev=>{if(ev.target.closest('[data-close]')){closeSheet();onClose&&onClose();}});
@@ -984,7 +984,7 @@ function drawPlayer(full){
       <div class="ptop"><button class="x" data-p="exit" aria-label="Stop session">✕</button><div class="lab">${esc(s.block)}${roundTxt}${P.lite?' · Lighter':''}<b class="num">${P.i+1} / ${P.steps.length}</b></div><button class="x" data-p="mute" aria-label="Sound on or off">${S.sound?'🔊':'🔈'}</button></div>
       <div class="prog"><i style="width:${(P.i/P.steps.length*100).toFixed(1)}%"></i></div>
       <div class="oval"><div id="ov">${fieldSVG(frac,mode)}</div><div class="center"><div><div class="phase" id="ph" style="color:${pc}">${phase}</div><div class="big-t" id="bt">${big}</div><div class="unit" id="un">${unit}</div></div></div></div>
-      <div class="pname ${dx?'has-demo':''}">${dx?`<button class="pdemo" data-p="howto" aria-label="How to">${window.Demo.svg(dx,'demo','14 14 172 129')}</button>`:''}<div><h2>${esc(s.name)}</h2><p>${esc(sub)}</p></div></div>
+      <div class="pname ${dx?'has-demo':''}">${dx?`<button class="pdemo" data-p="howto" aria-label="How to">${window.Demo.svg(dx,'demo','20 6 160 120')}</button>`:''}<div><h2>${esc(s.name)}</h2><p>${esc(sub)}</p></div></div>
       <div class="next">${nx?`<span>Then: <b>${esc(nx)}</b></span>`:'<span><b>Last one'+(nm()?', '+esc(nm()):'')+'!</b></span>'}</div>
       <div class="pctl"><button class="sm" data-p="prev" aria-label="Previous">${IC.prev}</button>
         ${s.k==='reps'?`<button class="main go" data-p="done">${IC.tick} Done</button>`:`<button class="main" data-p="pause" id="pp">${P.paused?IC.play+' Resume':IC.pause+' Pause'}</button>`}

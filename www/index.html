@@ -274,15 +274,15 @@ h1,h2,h3{margin:0;text-wrap:balance}
 /* Exercise demos */
 .row.demo-row{grid-template-columns:64px 1fr auto}
 .thumb{width:64px;display:grid;gap:2px;justify-items:center;align-self:start;margin-top:2px}
-.thumb .demo{width:64px;height:48px;background:var(--seat);border-radius:10px;border:1px solid var(--line)}
+.thumb .demo{width:64px;height:48px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
 .thumb span{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
 .optdemo{display:grid!important;grid-template-columns:72px 1fr;gap:10px;align-items:center}
 .optdemo b,.optdemo small{display:block}
-.optdemo .demo{width:72px;height:54px;background:var(--seat);border-radius:10px}
-.howto .demo.big{width:100%;height:auto;aspect-ratio:4/3;background:var(--seat);border-radius:16px;border:1px solid var(--line);display:block;margin-bottom:12px}
+.optdemo .demo{width:72px;height:54px;border-radius:10px;overflow:hidden}
+.howto .demo.demo-lg{width:100%;height:auto;aspect-ratio:4/3;overflow:hidden;border-radius:16px;border:1px solid var(--line);display:block;margin-bottom:12px}
 .pname.has-demo{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center;text-align:left}
 .pname.has-demo p{margin-left:0}
-.pdemo .demo{width:96px;height:72px;background:rgba(244,239,230,.05);border-radius:12px;border:1px solid var(--line)}
+.pdemo .demo{width:96px;height:72px;overflow:hidden;border-radius:12px;border:1px solid var(--line)}
 </style>
 </head>
 <body>
