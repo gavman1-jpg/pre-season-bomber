@@ -3,7 +3,7 @@
    Side view faces right. Front view (view:'front') shows the figure facing you: a1/l1 = screen-left limbs. */
 (function(){
 "use strict";
-const L={torso:38,neck:5,head:8,ua:19,fa:18,th:24,sh:24,ft:7},G=136,CX=100;
+const L={torso:36,neck:4,head:12.5,ua:19,fa:18,th:24,sh:24,ft:7},G=136,CX=100;
 const V=(a,l)=>{const r=a*Math.PI/180;return [Math.sin(r)*l,Math.cos(r)*l];};
 const add=(p,v)=>[p[0]+v[0],p[1]+v[1]];
 
@@ -114,31 +114,80 @@ function frameJoints(d,ms){const p=poseAt(d,ms);return {p,j:place(p,joints(p,d.v
 const seg=(a,b,c,w)=>`<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="${c}" stroke-width="${w||6}" stroke-linecap="round"/>`;
 function propsSVG(d,j){
   let s='';(d.props||[]).forEach(pr=>{
-    if(pr.box){const [x1,x2,h]=pr.box;s+=`<rect x="${CX+x1}" y="${G-h}" width="${x2-x1}" height="${h}" rx="3" fill="rgba(244,239,230,.12)" stroke="rgba(244,239,230,.35)" stroke-width="1.5"/>`;}
-    if(pr.wall!=null)s+=`<rect x="${CX+pr.wall-8}" y="${G-120}" width="8" height="120" fill="rgba(244,239,230,.14)"/>`;
-    if(pr.bar){const [x,h]=pr.bar;s+=`<line x1="${CX+x-26}" y1="${G-h}" x2="${CX+x+26}" y2="${G-h}" stroke="rgba(244,239,230,.6)" stroke-width="4" stroke-linecap="round"/><line x1="${CX+x+26}" y1="${G-h}" x2="${CX+x+26}" y2="${G}" stroke="rgba(244,239,230,.2)" stroke-width="3"/>`;}
-    if(pr.pad!=null)s+=`<rect x="${CX+pr.pad-9}" y="${G-14}" width="16" height="14" rx="4" fill="var(--gold)" opacity=".7"/>`;
+    if(pr.box){const [x1,x2,h]=pr.box;s+=`<rect x="${CX+x1}" y="${G-h+3}" width="${x2-x1}" height="${h}" rx="3" fill="#c98f55" stroke="#140f10" stroke-width="2"/><line x1="${CX+x1+3}" y1="${G-h+9}" x2="${CX+x2-3}" y2="${G-h+9}" stroke="#a8743f" stroke-width="2"/>`;}
+    if(pr.wall!=null)s+=`<rect x="${CX+pr.wall-10}" y="${G-120}" width="10" height="123" fill="#e9d5b4" stroke="#140f10" stroke-width="2"/>`;
+    if(pr.bar){const [x,h]=pr.bar;s+=`<line x1="${CX+x+26}" y1="${G-h}" x2="${CX+x+26}" y2="${G+3}" stroke="#4b5563" stroke-width="4"/><line x1="${CX+x-26}" y1="${G-h}" x2="${CX+x+28}" y2="${G-h}" stroke="#140f10" stroke-width="6" stroke-linecap="round"/><line x1="${CX+x-26}" y1="${G-h}" x2="${CX+x+28}" y2="${G-h}" stroke="#9ca3af" stroke-width="3.5" stroke-linecap="round"/>`;}
+    if(pr.pad!=null)s+=`<rect x="${CX+pr.pad-10}" y="${G-12}" width="18" height="15" rx="5" fill="var(--gold)" stroke="#140f10" stroke-width="2"/>`;
   });return s;
 }
 function propsFront(d,j){
   let s='';(d.props||[]).forEach(pr=>{
-    if(pr.ball){const q=j[pr.ball];s+=`<circle cx="${q[0].toFixed(1)}" cy="${(q[1]).toFixed(1)}" r="7" fill="var(--gold)"/>`;}
-    if(pr.pack){const q=j[pr.pack];s+=`<rect x="${(q[0]-8).toFixed(1)}" y="${(q[1]-6).toFixed(1)}" width="16" height="18" rx="4" fill="var(--gold)" opacity=".85"/>`;}
-    if(pr.band){const q=j[pr.band];s+=`<line x1="${(q[0]).toFixed(1)}" y1="${q[1].toFixed(1)}" x2="${CX-60}" y2="${q[1].toFixed(1)}" stroke="var(--gold)" stroke-width="2.5"/>`;}
+    if(pr.ball){const q=j[pr.ball];s+=`<circle cx="${q[0].toFixed(1)}" cy="${(q[1]).toFixed(1)}" r="7.5" fill="var(--gold)" stroke="#140f10" stroke-width="2"/>`;}
+    if(pr.pack){const q=j[pr.pack];s+=`<rect x="${(q[0]-9).toFixed(1)}" y="${(q[1]-7).toFixed(1)}" width="18" height="20" rx="5" fill="#3b82f6" stroke="#140f10" stroke-width="2"/><rect x="${(q[0]-5).toFixed(1)}" y="${(q[1]+1).toFixed(1)}" width="10" height="7" rx="2" fill="#2563eb" stroke="#140f10" stroke-width="1.4"/>`;}
+    if(pr.band){const q=j[pr.band];s+=`<line x1="${(q[0]).toFixed(1)}" y1="${q[1].toFixed(1)}" x2="${CX-62}" y2="${q[1].toFixed(1)}" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round"/><rect x="${CX-68}" y="${(q[1]-10).toFixed(1)}" width="7" height="20" rx="2" fill="#6b7280" stroke="#140f10" stroke-width="1.5"/>`;}
   });return s;
+}
+/* Cartoon character: outlined rounded limbs, big head with a face, kit in the sport's colours. */
+const INK='#140f10',SKIN='#f0b48c',SKIN_D='#d99a73',HAIR='#3b2417',SHORTS='#1d2433',SOCK='#f4efe6',BOOT='#18181b';
+const f1=n=>n.toFixed(1);
+const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+const ln=(a,b,c,w,extra)=>`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${extra||''}/>`;
+/* a limb: outline, then colour bands along it (list of [fromFrac,toFrac,colour]) */
+function limb(a,b,w,bands,shade){
+  let o=ln(a,b,INK,w+3.6);
+  bands.forEach(([p,q,c])=>{o+=ln(mix(a,b,p),mix(a,b,q),c,w);});
+  if(shade)o+=ln(a,b,'rgba(0,0,0,.22)',w);
+  return o;
+}
+function armSVG(j,s,shade){
+  const S=j.S,E=j['e'+s],Hn=j['h'+s];
+  return limb(S,E,8.5,[[0,.55,'var(--red)'],[.55,1,SKIN]],shade)+limb(E,Hn,7.5,[[0,1,SKIN]],shade)
+    +`<circle cx="${f1(Hn[0])}" cy="${f1(Hn[1])}" r="5" fill="${shade?SKIN_D:SKIN}" stroke="${INK}" stroke-width="1.8"/>`;
+}
+function legSVG(j,s,shade){
+  const H=j.H,K=j['k'+s],A=j['a'+s],T=j['t'+s];
+  return limb(H,K,10.5,[[0,.6,SHORTS],[.6,1,SKIN]],shade)
+    +limb(K,A,9,[[0,.3,SKIN],[.3,1,SOCK]],shade)+ln(mix(K,A,.34),mix(K,A,.42),'var(--red)',9)
+    +ln(mix(A,T,-.25),mix(A,T,1.05),INK,10.5)+ln(mix(A,T,-.2),T,BOOT,7.5);
+}
+function headSVG(j,p,front){
+  const C=j.C,r=L.head,rot=((p.t+(p.hd||0))-180);
+  let face;
+  if(front){
+    face=`<path d="M${-r},-1 A${r} ${r} 0 0 1 ${r},-1 Q${r*.4},${-r*.55} 0,${-r*.6} Q${-r*.4},${-r*.55} ${-r},-1Z" fill="${HAIR}"/>`
+      +`<ellipse cx="-4.2" cy="1.2" rx="1.6" ry="2.1" fill="${INK}"/><ellipse cx="4.2" cy="1.2" rx="1.6" ry="2.1" fill="${INK}"/><circle cx="-3.7" cy=".5" r=".6" fill="#fff"/><circle cx="4.7" cy=".5" r=".6" fill="#fff"/>`
+      +`<path d="M-3.6 5.2 Q0 8.4 3.6 5.2" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/>`
+      +`<circle cx="-6.4" cy="4.6" r="1.6" fill="#ef8a7a" opacity=".55"/><circle cx="6.4" cy="4.6" r="1.6" fill="#ef8a7a" opacity=".55"/>`;
+  } else {
+    face=`<path d="M${-r},1 A${r} ${r} 0 0 1 ${r*.85},${-r*.5} Q${r*.2},${-r*.25} ${-r*.1},${-r*.15} Q${-r*.5},${r*.1} ${-r*.55},${r*.55} Q${-r*.9},${r*.55} ${-r},1Z" fill="${HAIR}"/>`
+      +`<ellipse cx="-2.6" cy="2" rx="1.8" ry="2.4" fill="${SKIN_D}"/>`
+      +`<ellipse cx="6" cy="0.4" rx="1.6" ry="2.1" fill="${INK}"/><circle cx="6.5" cy="-0.3" r=".6" fill="#fff"/><path d="M4 -3.6 Q6.4 -4.6 8.6 -3.6" fill="none" stroke="${INK}" stroke-width="1.4" stroke-linecap="round"/>`
+      +`<path d="M5.6 6 Q8.4 7.8 10.4 5.4" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/>`
+      +`<circle cx="8.4" cy="3.8" r="1.6" fill="#ef8a7a" opacity=".6"/>`;
+  }
+  return `<g transform="translate(${f1(C[0])} ${f1(C[1])}) rotate(${f1(rot)})"><circle r="${r}" fill="${SKIN}" stroke="${INK}" stroke-width="2.2"/>${face}</g>`;
+}
+function torsoSVG(j,front){
+  const H=j.H,S=j.S,w=front?21:18;
+  return ln(H,S,INK,w+3.6)+ln(mix(H,S,-.05),S,'var(--red)',w)
+    +ln(mix(H,S,.08),mix(H,S,.22),'rgba(255,255,255,.28)',w*.62)
+    +ln(H,mix(H,S,.06),SHORTS,w)
+    +ln(S,j.N,INK,7.5)+ln(S,j.N,SKIN,4.5);
 }
 function svgAt(id,ms,fi){
   const d=def(id);if(!d)return '';
-  const j=fi!=null?place(d.f[fi],joints(d.f[fi],d.view==='front'),d.cx):frameJoints(d,ms).j,fr=d.view==='front';
-  const back='rgba(244,239,230,.42)',front='#f4efe6',acc='var(--red)';
-  const c1=fr?front:back;
-  let s=`<line x1="10" y1="${G+3.5}" x2="190" y2="${G+3.5}" stroke="rgba(244,239,230,.25)" stroke-width="2"/>`+propsSVG(d,j);
-  s+=seg(j.H,j.k1,c1)+seg(j.k1,j.a1,c1)+seg(j.a1,j.t1,c1,5);
-  s+=seg(j.S,j.e1,c1,5.5)+seg(j.e1,j.h1,c1,5);
-  s+=seg(j.H,j.S,acc,8)+seg(j.S,j.N,front,5);
-  s+=`<circle cx="${j.C[0].toFixed(1)}" cy="${j.C[1].toFixed(1)}" r="${L.head}" fill="${front}"/>`;
-  s+=seg(j.H,j.k2,front)+seg(j.k2,j.a2,front)+seg(j.a2,j.t2,front,5);
-  s+=seg(j.S,j.e2,front,5.5)+seg(j.e2,j.h2,front,5);
+  const fr=d.view==='front';
+  let p,j;
+  if(fi!=null){p=d.f[fi];j=place(p,joints(p,fr),d.cx);}else{const r=frameJoints(d,ms);p=r.p;j=r.j;}
+  const air=Math.max(0,G-(Math.max(j.t1[1],j.t2[1])+3.5));
+  let s=`<rect width="200" height="150" fill="#d6ecfa"/><circle cx="172" cy="24" r="12" fill="#ffe08a"/>`
+    +`<g fill="#fff" opacity=".9"><ellipse cx="38" cy="26" rx="16" ry="6"/><ellipse cx="50" cy="22" rx="11" ry="7"/><ellipse cx="128" cy="40" rx="13" ry="5"/></g>`
+    +`<rect x="0" y="${G+3}" width="200" height="${150-G}" fill="#7cc86a"/><rect x="0" y="${G+3}" width="200" height="2.5" fill="#5aa84a"/>`;
+  s+=`<ellipse cx="${f1(j.H[0])}" cy="${G+5}" rx="${f1(Math.max(10,26-air*.35))}" ry="3.4" fill="rgba(0,0,0,.22)"/>`;
+  s+=propsSVG(d,j);
+  s+=legSVG(j,'1',!fr)+armSVG(j,'1',!fr);
+  s+=torsoSVG(j,fr)+headSVG(j,p,fr);
+  s+=legSVG(j,'2',false)+armSVG(j,'2',false);
   s+=propsFront(d,j);
   return s;
 }
