@@ -22,7 +22,7 @@ const A={
   squat:{f:[P({}),P(squatDown)]},
   bagsquat:{f:[P({a1:[30,160],a2:[30,160]}),P(Object.assign({},squatDown,{a1:[50,170],a2:[50,170]}))],props:[{pack:'h2'}]},
   wallsit:{f:[P({t:180,l1:[90,0],l2:[90,0],a1:[8,8],a2:[8,8]}),P({t:179,l1:[90,0],l2:[90,0],a1:[8,8],a2:[8,8]})],props:[{wall:-5}],hold:1},
-  stepup:{f:[P({l2:[80,0],l1:[-5,-5]}),P({x:22,rest:20,l1:[0,0],l2:[0,0]})],props:[{box:[2,60,20]}]},
+  stepup:{f:[P({l2:[60,0],l1:[-5,-5]}),P({x:22,rest:12,l1:[0,0],l2:[0,0]})],props:[{box:[2,60,12]}]},
   splitsquat:{f:[P({l2:[22,-2],l1:[-22,-22,40]}),P({l2:[82,-8],l1:[-12,-80,5]})]},
   inclinepush:{f:[P({t:122,l1:[-58,-58,10],l2:[-58,-58,10],a1:[20,20],a2:[22,22]}),P({t:110,l1:[-70,-70,10],l2:[-70,-70,10],a1:[-75,25],a2:[-73,27]})],props:[{box:[38,70,34]}],anc:['h2',58,34]},
   bear:{f:[P({t:92,a1:[2,2],a2:[8,8],l1:[5,-85,0],l2:[15,-75,0]}),P({t:92,a1:[10,10],a2:[0,0],l1:[15,-75,0],l2:[5,-85,0]})],k:[[0,450,80],[1,450,80]]},
@@ -61,7 +61,7 @@ const A={
   hopstick:{f:[P({l1:[-5,-80,10]}),P({x:16,air:14,a1:[60,60],a2:[60,60],l1:[-5,-80,10],l2:[-10,-10,40]}),P({x:32,t:155,a1:[70,70],a2:[70,70],l1:[-5,-80,10],l2:[55,-15]})],k:[[0,0,300],[1,280,0],[2,280,1000]],cx:-16},
   lathop:{view:'front',f:[P({t:180,x:-18,a1:[-30,-30],a2:[30,30],l1:[0,0],l2:[25,60]}),P({t:180,x:0,air:12,a1:[-50,-50],a2:[50,50],l1:[0,0,-90],l2:[25,60]}),P({t:172,x:18,a1:[-35,-35],a2:[35,35],l1:[-30,-55],l2:[12,-8]})],k:[[0,0,300],[1,260,0],[2,260,1000]]},
   calf:{f:[P({l1:[0,0,90],l2:[0,0,90]}),P({l1:[0,0,35],l2:[0,0,35]})]},
-  slcalf:{f:[P({l1:[-5,-80,10],l2:[0,0,95],rest:16}),P({l1:[-5,-80,10],l2:[0,0,35],rest:16})],props:[{box:[-8,30,16]}]},
+  slcalf:{f:[P({l1:[-5,-80,10],l2:[0,0,95],rest:10}),P({l1:[-5,-80,10],l2:[0,0,35],rest:10})],props:[{box:[-8,30,10]}]},
   squeeze:{f:[P(supine),P(supine)],props:[{ball:'k2'}],hold:1},
   nordic:{f:[P(kneel),P({t:125,a1:[45,45],a2:[48,48],l1:[-55,-90,-90],l2:[-55,-90,-90]})],k:[[0,700,300],[1,2600,300]],props:[{pad:-48}],anc:['k2',0,0]},
   copen:{view:'front',f:[P({t:108,a1:[0,90],a2:[178,178],l1:[-78,-60,-150],l2:[-72,-72,0]}),P({t:107,a1:[0,90],a2:[180,180],l1:[-79,-60,-150],l2:[-73,-73,0]})],props:[{box:[-80,-40,26]}],hold:1},
@@ -92,8 +92,8 @@ function place(p,j,cx){
   let dx=CX+(cx||0)+(p.x||0),dy;
   if(p.anc){const q=j[p.anc[0]];dx=CX+p.anc[1]-q[0];dy=G-p.anc[2]-q[1];}
   else{let m=-1e9;for(const k in j){let y=j[k][1];if(k==='C')y+=L.head-1;else if(k==='H'||k==='S')y+=Math.max(3.5,6.5*Math.abs(Math.sin(p.t*Math.PI/180)));else y+=3.5;m=Math.max(m,y);}dy=G-(p.rest||0)-(p.air||0)-m;
-    /* keep jumps inside the frame (thumbnails crop to y>=6): lower the jump height if the head would go off the top */
-    if(p.air){let top=1e9;for(const k in j){let y=j[k][1];if(k==='C')y-=L.head+2;else y-=6;top=Math.min(top,y);}const over=TOP-(top+dy);if(over>0)dy+=Math.min(p.air,over);}}
+    /* keep jumps inside the frame (thumbnails crop to y>=8, see THUMB): lower the jump height if the head would go off the top */
+    if(p.air){let top=1e9;for(const k in j){let y=j[k][1];if(k==='C')y-=L.head+2;else if(k[0]==='h')y-=9;else y-=6;top=Math.min(top,y);}const over=TOP-(top+dy);if(over>0)dy+=Math.min(p.air,over);}}
   const o={};for(const k in j)o[k]=[j[k][0]+dx,j[k][1]+dy];return o;
 }
 function lerp(a,b,t){
@@ -283,5 +283,7 @@ function tick(now){
 }
 function start(){if(!raf)raf=requestAnimationFrame(tick);}
 function svg(id,cls,vb){if(!has(id))return '';start();return `<svg class="${cls||'demo'}" viewBox="${vb||'0 0 200 150'}" data-demo="${id}" role="img" aria-label="Animated demonstration">${svgAt(id,0)}</svg>`;}
-window.Demo={svg,has,svgAt,frames:id=>def(id).f.length,start,ids:()=>Object.keys(A)};
+/* thumbnail crop: 4:3, trimmed a little off each side but keeping heads, boots and the grass in view */
+const THUMB='10 8 180 135';
+window.Demo={THUMB,svg,has,svgAt,frames:id=>def(id).f.length,start,ids:()=>Object.keys(A)};
 })();
