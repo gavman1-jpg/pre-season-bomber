@@ -105,6 +105,28 @@ const EX={
   wallslide:{n:'Wall slides',t:'reps',a:10,cat:'arm',min:9,sub:'armcircle',cue:'Back and arms on a wall, slide arms up and down slowly.',why:'Overhead mobility.'},
   extrot:{n:'Band external rotations',t:'reps',a:12,each:'arm',cat:'arm',min:12,sub:'ytw',cue:'Elbow tucked at your side, rotate the band out slowly.',why:'Rotator cuff strength for throwing.'}
 };
+/* "Watch for" safety cues, shown with each demo. */
+const SAFE_CAT={legs:'Knees stay in line with your toes, never caving in. Heels stay down, chest up.',
+  push:'Body stays in one straight line from head to heels. No sagging hips.',
+  lunge:'Front knee stays over the ankle and in line with your toes. Keep your balance before speeding up.',
+  pull:'Shoulders down and back, no shrugging. Smooth and controlled, no jerking.',
+  hips:'Push through the heels and squeeze your bum. Don\'t arch your lower back.',
+  core:'Lower back stays flat and controlled. Stop if your back hurts.',
+  power:'Land soft and quiet with knees over toes. Fewer good jumps beat lots of sloppy ones.',
+  land:'Land on soft knees, knee over toes, and hold the landing still before the next one.',
+  prev:'Slow and controlled. Mild effort is fine, sharp pain is not.',
+  arm:'Slow and controlled with no pain in the shoulder. Keep shoulders away from your ears.'};
+const SAFE_EX={nordic:'Only lower as far as you can control, then catch yourself with your hands. A partner must hold your ankles firmly.',
+  copen:'Start with the short version: knee on the bench. Stop if you feel pain in the groin.',
+  neck:'Gentle pressure only. Your head shouldn\'t move. Stop if you feel pain, tingling or dizziness.',
+  chinneg:'Use a sturdy bar with an adult nearby. Lower slowly and land softly from the bar.',
+  dips:'Only go down until elbows reach 90°. Stop if the front of your shoulder hurts.',
+  row:'Check the bar is solid before you start. Body stays straight like a plank.',
+  tuck:'Reset your feet between each jump. Stop if your knees ache.',
+  hopstick:'Start with small hops. If you wobble, make the next hop smaller.',
+  stepup:'Use a low, stable step that won\'t slide. Whole foot on the step.',
+  bagsquat:'Keep the backpack light: technique first, weight second.'};
+Object.keys(EX).forEach(k=>{EX[k].safe=SAFE_EX[k]||SAFE_CAT[EX[k].cat];});
 const CAT={legs:'Legs',push:'Push',lunge:'Lunges',pull:'Pull',hips:'Hips',core:'Core',power:'Jumps',land:'Landing',prev:'Injury prevention',arm:'Arm care'};
 
 /* ---------- Sports ----------
