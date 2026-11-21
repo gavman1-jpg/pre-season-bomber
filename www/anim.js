@@ -3,7 +3,7 @@
    Side view faces right. Front view (view:'front') shows the figure facing you: a1/l1 = screen-left limbs. */
 (function(){
 "use strict";
-const L={torso:36,neck:4,head:12.5,ua:19,fa:18,th:24,sh:24,ft:7},G=136,CX=100;
+const TOP=15,L={torso:36,neck:4,head:12.5,ua:19,fa:18,th:24,sh:24,ft:7},G=136,CX=100;
 const V=(a,l)=>{const r=a*Math.PI/180;return [Math.sin(r)*l,Math.cos(r)*l];};
 const add=(p,v)=>[p[0]+v[0],p[1]+v[1]];
 
@@ -22,7 +22,7 @@ const A={
   squat:{f:[P({}),P(squatDown)]},
   bagsquat:{f:[P({a1:[30,160],a2:[30,160]}),P(Object.assign({},squatDown,{a1:[50,170],a2:[50,170]}))],props:[{pack:'h2'}]},
   wallsit:{f:[P({t:180,l1:[90,0],l2:[90,0],a1:[8,8],a2:[8,8]}),P({t:179,l1:[90,0],l2:[90,0],a1:[8,8],a2:[8,8]})],props:[{wall:-5}],hold:1},
-  stepup:{f:[P({l2:[80,0],l1:[-5,-5]}),P({x:22,rest:20,l1:[0,0],l2:[0,0]})],props:[{box:[2,60,20]}]},
+  stepup:{f:[P({l2:[60,0],l1:[-5,-5]}),P({x:22,rest:12,l1:[0,0],l2:[0,0]})],props:[{box:[2,60,12]}]},
   splitsquat:{f:[P({l2:[22,-2],l1:[-22,-22,40]}),P({l2:[82,-8],l1:[-12,-80,5]})]},
   inclinepush:{f:[P({t:122,l1:[-58,-58,10],l2:[-58,-58,10],a1:[20,20],a2:[22,22]}),P({t:110,l1:[-70,-70,10],l2:[-70,-70,10],a1:[-75,25],a2:[-73,27]})],props:[{box:[38,70,34]}],anc:['h2',58,34]},
   bear:{f:[P({t:92,a1:[2,2],a2:[8,8],l1:[5,-85,0],l2:[15,-75,0]}),P({t:92,a1:[10,10],a2:[0,0],l1:[15,-75,0],l2:[5,-85,0]})],k:[[0,450,80],[1,450,80]]},
@@ -61,7 +61,7 @@ const A={
   hopstick:{f:[P({l1:[-5,-80,10]}),P({x:16,air:14,a1:[60,60],a2:[60,60],l1:[-5,-80,10],l2:[-10,-10,40]}),P({x:32,t:155,a1:[70,70],a2:[70,70],l1:[-5,-80,10],l2:[55,-15]})],k:[[0,0,300],[1,280,0],[2,280,1000]],cx:-16},
   lathop:{view:'front',f:[P({t:180,x:-18,a1:[-30,-30],a2:[30,30],l1:[0,0],l2:[25,60]}),P({t:180,x:0,air:12,a1:[-50,-50],a2:[50,50],l1:[0,0,-90],l2:[25,60]}),P({t:172,x:18,a1:[-35,-35],a2:[35,35],l1:[-30,-55],l2:[12,-8]})],k:[[0,0,300],[1,260,0],[2,260,1000]]},
   calf:{f:[P({l1:[0,0,90],l2:[0,0,90]}),P({l1:[0,0,35],l2:[0,0,35]})]},
-  slcalf:{f:[P({l1:[-5,-80,10],l2:[0,0,95],rest:16}),P({l1:[-5,-80,10],l2:[0,0,35],rest:16})],props:[{box:[-8,30,16]}]},
+  slcalf:{f:[P({l1:[-5,-80,10],l2:[0,0,95],rest:10}),P({l1:[-5,-80,10],l2:[0,0,35],rest:10})],props:[{box:[-8,30,10]}]},
   squeeze:{f:[P(supine),P(supine)],props:[{ball:'k2'}],hold:1},
   nordic:{f:[P(kneel),P({t:125,a1:[45,45],a2:[48,48],l1:[-55,-90,-90],l2:[-55,-90,-90]})],k:[[0,700,300],[1,2600,300]],props:[{pad:-48}],anc:['k2',0,0]},
   copen:{view:'front',f:[P({t:108,a1:[0,90],a2:[178,178],l1:[-78,-60,-150],l2:[-72,-72,0]}),P({t:107,a1:[0,90],a2:[180,180],l1:[-79,-60,-150],l2:[-73,-73,0]})],props:[{box:[-80,-40,26]}],hold:1},
@@ -78,15 +78,22 @@ function joints(p,front){
   const j={},H=[0,0];j.H=H;
   j.S=add(H,V(p.t,L.torso));const ht=p.t+(p.hd||0);
   j.N=add(j.S,V(ht,L.neck));j.C=add(j.N,V(ht,L.head));
-  [['1',p.a1],['2',p.a2]].forEach(([s,a])=>{j['e'+s]=add(j.S,V(a[0],L.ua));j['h'+s]=add(j['e'+s],V(a[1],L.fa));});
-  [['1',p.l1,-1],['2',p.l2,1]].forEach(([s,l,sg])=>{j['k'+s]=add(H,V(l[0],L.th));j['a'+s]=add(j['k'+s],V(l[1],L.sh));
+  /* limb roots: arms hang from just below the neck; facing you, shoulders and hips sit out to each side (1 = screen-left) */
+  const tl=Math.hypot(j.S[0],j.S[1])||1,tu=[j.S[0]/tl,j.S[1]/tl],tn=[-tu[1],tu[0]];
+  const root=(base,down,side)=>[base[0]-tu[0]*down+tn[0]*side,base[1]-tu[1]*down+tn[1]*side];
+  j.r1=root(j.S,front?4:0,front?-8.2:0);j.r2=root(j.S,front?4:0,front?8.2:0);
+  j.p1=root(H,0,front?-4.4:0);j.p2=root(H,0,front?4.4:0);
+  [['1',p.a1],['2',p.a2]].forEach(([s,a])=>{j['e'+s]=add(j['r'+s],V(a[0],L.ua));j['h'+s]=add(j['e'+s],V(a[1],L.fa));});
+  [['1',p.l1,-1],['2',p.l2,1]].forEach(([s,l,sg])=>{j['k'+s]=add(j['p'+s],V(l[0],L.th));j['a'+s]=add(j['k'+s],V(l[1],L.sh));
     const fa=l[2]!=null?l[2]:(front?l[1]+90*sg:90);j['t'+s]=add(j['a'+s],V(fa,L.ft));});
   return j;
 }
 function place(p,j,cx){
   let dx=CX+(cx||0)+(p.x||0),dy;
   if(p.anc){const q=j[p.anc[0]];dx=CX+p.anc[1]-q[0];dy=G-p.anc[2]-q[1];}
-  else{let m=-1e9;for(const k in j){let y=j[k][1];if(k==='C')y+=L.head;if(k!=='H'&&k!=='S'&&k!=='N')y+=3.5;else y+=3.5;m=Math.max(m,y);}dy=G-(p.rest||0)-(p.air||0)-m;}
+  else{let m=-1e9;for(const k in j){let y=j[k][1];if(k==='C')y+=L.head-1;else if(k==='H'||k==='S')y+=Math.max(3.5,6.5*Math.abs(Math.sin(p.t*Math.PI/180)));else y+=3.5;m=Math.max(m,y);}dy=G-(p.rest||0)-(p.air||0)-m;
+    /* keep jumps inside the frame (thumbnails crop to y>=8, see THUMB): lower the jump height if the head would go off the top */
+    if(p.air){let top=1e9;for(const k in j){let y=j[k][1];if(k==='C')y-=L.head+2;else if(k[0]==='h')y-=9;else y-=6;top=Math.min(top,y);}const over=TOP-(top+dy);if(over>0)dy+=Math.min(p.air,over);}}
   const o={};for(const k in j)o[k]=[j[k][0]+dx,j[k][1]+dy];return o;
 }
 function lerp(a,b,t){
@@ -127,52 +134,119 @@ function propsFront(d,j){
     if(pr.band){const q=j[pr.band];s+=`<line x1="${(q[0]).toFixed(1)}" y1="${q[1].toFixed(1)}" x2="${CX-62}" y2="${q[1].toFixed(1)}" stroke="#16a34a" stroke-width="3.5" stroke-linecap="round"/><rect x="${CX-68}" y="${(q[1]-10).toFixed(1)}" width="7" height="20" rx="2" fill="#6b7280" stroke="#140f10" stroke-width="1.5"/>`;}
   });return s;
 }
-/* Cartoon character: outlined rounded limbs, big head with a face, kit in the sport's colours. */
-const INK='#140f10',SKIN='#f0b48c',SKIN_D='#d99a73',HAIR='#3b2417',SHORTS='#1d2433',SOCK='#f4efe6',BOOT='#18181b';
+/* Cartoon character: tapered outlined limbs, shaped body, kit in the sport's colours
+   (jumper = --red, trim = --red-deep, chest band = --gold), hands, boots, a face with hair and ears. */
+const INK='#140f10',SKIN='#f0b48c',SKIN_D='#d99a73',HAIR='#3b2417',SHORTS='#1d2433',SHORTS_L='#2c3547',SOCK='#f4efe6',BOOT='#18181b',SOLE='#52525b';
+const PRI='var(--red)',DEEP='var(--red-deep)',ACC='var(--gold)',OL=1.9;
 const f1=n=>n.toFixed(1);
 const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1]];
+const unit=v=>{const l=Math.hypot(v[0],v[1])||1;return [v[0]/l,v[1]/l];};
+const nrm=u=>[-u[1],u[0]];
 const ln=(a,b,c,w,extra)=>`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${extra||''}/>`;
-/* a limb: outline, then colour bands along it (list of [fromFrac,toFrac,colour]) */
-function limb(a,b,w,bands,shade){
-  let o=ln(a,b,INK,w+3.6);
-  bands.forEach(([p,q,c])=>{o+=ln(mix(a,b,p),mix(a,b,q),c,w);});
-  if(shade)o+=ln(a,b,'rgba(0,0,0,.22)',w);
-  return o;
+/* tapered capsule from a (radius ra) to b (radius rb), as path data */
+function capD(a,b,ra,rb){
+  const u=unit(sub(b,a)),n=nrm(u);
+  const p=(c,r,s)=>`${f1(c[0]+n[0]*r*s)} ${f1(c[1]+n[1]*r*s)}`;
+  return `M${p(a,ra,1)}L${p(b,rb,1)}A${f1(rb)} ${f1(rb)} 0 0 0 ${p(b,rb,-1)}L${p(a,ra,-1)}A${f1(ra)} ${f1(ra)} 0 0 0 ${p(a,ra,1)}Z`;
 }
-function armSVG(j,s,shade){
-  const S=j.S,E=j['e'+s],Hn=j['h'+s];
-  return limb(S,E,8.5,[[0,.55,'var(--red)'],[.55,1,SKIN]],shade)+limb(E,Hn,7.5,[[0,1,SKIN]],shade)
-    +`<circle cx="${f1(Hn[0])}" cy="${f1(Hn[1])}" r="5" fill="${shade?SKIN_D:SKIN}" stroke="${INK}" stroke-width="1.8"/>`;
+/* A body part is a list of shapes [pathData(grow), fill, outlined?]. Drawn as one silhouette outline, then fills, then optional shade. */
+function Part(){
+  const sh=[];
+  return {
+    cap(a,b,ra,rb,fill,ol){sh.push([g=>capD(a,b,ra+g,rb+g),fill,ol!==false]);return this;},
+    ell(c,rx,ry,rot,fill,ol){sh.push([g=>{const r=rot*Math.PI/180,ux=Math.cos(r),uy=Math.sin(r),X=rx+g,Y=ry+g,
+      p=(s)=>`${f1(c[0]+ux*X*s)} ${f1(c[1]+uy*X*s)}`;return `M${p(1)}A${f1(X)} ${f1(Y)} ${f1(rot)} 1 0 ${p(-1)}A${f1(X)} ${f1(Y)} ${f1(rot)} 1 0 ${p(1)}Z`;},fill,ol!==false]);return this;},
+    raw(svg){sh.push([null,svg,false]);return this;},
+    /* flat stripe across a limb between a and b, w wide */
+    band(a,b,w,col){sh.push([null,`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="${col}" stroke-width="${f1(w)}"/>`,false]);return this;},
+    svg(shade){
+      let o='',f='',s='';
+      sh.forEach(([d,fill,ol])=>{
+        if(!d){f+=fill;return;}
+        if(ol)o+=`<path d="${d(OL)}" fill="${INK}"/>`;
+        f+=`<path d="${d(0)}" fill="${fill}"/>`;
+        if(shade&&ol)s+=`<path d="${d(0)}" fill="rgba(20,15,16,.24)"/>`;
+      });
+      return o+f+s;
+    }
+  };
 }
-function legSVG(j,s,shade){
-  const H=j.H,K=j['k'+s],A=j['a'+s],T=j['t'+s];
-  return limb(H,K,10.5,[[0,.6,SHORTS],[.6,1,SKIN]],shade)
-    +limb(K,A,9,[[0,.3,SKIN],[.3,1,SOCK]],shade)+ln(mix(K,A,.34),mix(K,A,.42),'var(--red)',9)
-    +ln(mix(A,T,-.25),mix(A,T,1.05),INK,10.5)+ln(mix(A,T,-.2),T,BOOT,7.5);
+function armSVG(j,s,shade,front){
+  const S=j['r'+s],E=j['e'+s],Hn=j['h'+s],u=unit(sub(Hn,E)),ang=Math.atan2(u[1],u[0])*180/Math.PI,n=nrm(u);
+  const pt=Part();
+  pt.cap(S,E,4.5,3.7,SKIN).cap(E,Hn,3.7,3,SKIN)
+    .cap(S,mix(S,E,.48),5.3,4.9,PRI)
+    .band(mix(S,E,.4),mix(S,E,.48),9.9,DEEP)
+    .ell([Hn[0]+u[0]*2.6,Hn[1]+u[1]*2.6],4.4,3.6,ang,SKIN)
+    .ell([Hn[0]+u[0]*1.4+n[0]*(s==='1'?-3:3)*(front?1:-1),Hn[1]+u[1]*1.4+n[1]*(s==='1'?-3:3)*(front?1:-1)],2.3,1.6,ang+35,SKIN);
+  return pt.svg(shade);
+}
+function legSVG(j,s,shade,front){
+  const H=j['p'+s],K=j['k'+s],A=j['a'+s],T=j['t'+s];
+  const u=unit(sub(T,A)),n=nrm(u),side=front?(s==='1'?1:-1):1;
+  const heel=[A[0]-u[0]*2.6,A[1]-u[1]*2.6],toe=[T[0]+u[0]*1.2,T[1]+u[1]*1.2];
+  const r=(t)=>4.5+(3.4-4.5)*t;
+  const pt=Part();
+  pt.cap(H,K,6.2,4.7,SKIN).cap(K,A,4.7,3.4,SKIN)
+    .ell(mix(K,A,.3),5,4.3,Math.atan2(A[1]-K[1],A[0]-K[0])*180/Math.PI,SKIN,false)
+    .cap(mix(K,A,.36),A,r(.36)+.25,3.65,SOCK)
+    .band(mix(K,A,.43),mix(K,A,.5),2*r(.46)+.4,PRI)
+    .band(mix(K,A,.55),mix(K,A,.6),2*r(.57)+.4,DEEP)
+    .cap(H,mix(H,K,.56),7.4,6.9,SHORTS)
+    .band(mix(H,K,.5),mix(H,K,.56),14.4,SHORTS_L)
+    .cap(heel,toe,4.3,3.5,BOOT)
+    .raw(ln([heel[0]+n[0]*side*3.4,heel[1]+n[1]*side*3.4],[toe[0]+n[0]*side*2.6,toe[1]+n[1]*side*2.6],SOLE,1.8))
+    .raw(ln([heel[0]-n[0]*side*.6+u[0]*1.6,heel[1]-n[1]*side*.6+u[1]*1.6],[heel[0]-n[0]*side*1.4+u[0]*4.6,heel[1]-n[1]*side*1.4+u[1]*4.6],'#fff',1.3,' opacity=".85"'));
+  return pt.svg(shade);
+}
+function torsoSVG(j,front){
+  const H=j.H,S=j.S,u=unit(sub(S,H)),n=nrm(u),wh=front?9.6:7.6,wc=front?11.2:8.6;
+  const at=(t,o)=>{const c=mix(H,S,t);return [c[0]+n[0]*o,c[1]+n[1]*o];};
+  const pt=Part();
+  /* jumper: flat-hemmed lower half (outline band then fill) under a capsule chest with round shoulders */
+  const j0=mix(H,S,-.06),j1=mix(H,S,.42),ju=[u[0]*OL,u[1]*OL];
+  pt.cap(S,j.N,3.3,3.1,SKIN)
+    .band([j0[0]-ju[0],j0[1]-ju[1]],j1,2*wh+2*OL,INK)
+    .band(j0,j1,2*wh,PRI)
+    .cap(mix(H,S,.36),mix(H,S,.97),wh+(wc-wh)*.36,wc,PRI)
+    .band(mix(H,S,.52),mix(H,S,.64),2*(wh+(wc-wh)*.58),ACC);
+  /* shorts waist: a flat band over the bottom of the jumper (outline first) */
+  const w0=mix(H,S,-.1),w1=mix(H,S,.13),wu=[u[0]*OL,u[1]*OL];
+  if(front)pt.band([w0[0]-wu[0],w0[1]-wu[1]],[w1[0]+wu[0],w1[1]+wu[1]],2*wh+1.4+2*OL,INK).band(w0,w1,2*wh+1.4,SHORTS);
+  else pt.cap(mix(H,S,-.02),mix(H,S,.08),wh+.6,wh+.5,SHORTS); /* side on: rounded seat so no corner sticks out */
+  pt.band(mix(H,S,.09),mix(H,S,.13),2*wh+(front?1.4:.6),SHORTS_L);
+  if(front){
+    const V=mix(S,H,.16),a=[S[0]+n[0]*4.6,S[1]+n[1]*4.6],b=[S[0]-n[0]*4.6,S[1]-n[1]*4.6];
+    pt.raw(`<path d="M${f1(a[0])} ${f1(a[1])}L${f1(V[0])} ${f1(V[1])}L${f1(b[0])} ${f1(b[1])}" fill="none" stroke="${DEEP}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`);
+  } else {
+    const c=at(.97,wc*.45);pt.ell(c,3.6,1.9,Math.atan2(n[1],n[0])*180/Math.PI,DEEP,false);
+  }
+  return pt.svg(false);
 }
 function headSVG(j,p,front){
   const C=j.C,r=L.head,rot=((p.t+(p.hd||0))-180);
-  let face;
+  let o,face;
   if(front){
-    face=`<path d="M${-r},-1 A${r} ${r} 0 0 1 ${r},-1 Q${r*.4},${-r*.55} 0,${-r*.6} Q${-r*.4},${-r*.55} ${-r},-1Z" fill="${HAIR}"/>`
-      +`<ellipse cx="-4.2" cy="1.2" rx="1.6" ry="2.1" fill="${INK}"/><ellipse cx="4.2" cy="1.2" rx="1.6" ry="2.1" fill="${INK}"/><circle cx="-3.7" cy=".5" r=".6" fill="#fff"/><circle cx="4.7" cy=".5" r=".6" fill="#fff"/>`
-      +`<path d="M-3.6 5.2 Q0 8.4 3.6 5.2" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/>`
-      +`<circle cx="-6.4" cy="4.6" r="1.6" fill="#ef8a7a" opacity=".55"/><circle cx="6.4" cy="4.6" r="1.6" fill="#ef8a7a" opacity=".55"/>`;
+    o=`<ellipse cx="${-r+.6}" cy="1.6" rx="2.9" ry="3.6" fill="${SKIN}" stroke="${INK}" stroke-width="1.9"/><ellipse cx="${r-.6}" cy="1.6" rx="2.9" ry="3.6" fill="${SKIN}" stroke="${INK}" stroke-width="1.9"/>`
+      +`<circle r="${r}" fill="${SKIN}" stroke="${INK}" stroke-width="2.2"/>`;
+    face=`<path d="M${-r+.4},1 C${-r-.4},${-r*1.3} ${r+.4},${-r*1.3} ${r-.4},1 L${r*.82},-2.2 L${r*.58},-5.4 L${r*.32},-3 L${r*.05},-6.2 L${-r*.22},-3.2 L${-r*.5},-5.8 L${-r*.72},-2.4 Z" fill="${HAIR}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+      +`<path d="M-6.6 -1.6 Q-4.4 -3 -2.4 -1.9M2.4 -1.9 Q4.4 -3 6.6 -1.6" fill="none" stroke="${HAIR}" stroke-width="1.5" stroke-linecap="round"/>`
+      +`<ellipse cx="-4.3" cy="1.6" rx="1.7" ry="2.2" fill="${INK}"/><ellipse cx="4.3" cy="1.6" rx="1.7" ry="2.2" fill="${INK}"/><circle cx="-3.8" cy=".8" r=".7" fill="#fff"/><circle cx="4.8" cy=".8" r=".7" fill="#fff"/>`
+      +`<path d="M-.3 3.4 Q.9 5 -.6 5.4" fill="none" stroke="${SKIN_D}" stroke-width="1.3" stroke-linecap="round"/>`
+      +`<path d="M-3.6 7 Q0 9.8 3.6 7" fill="#fff" stroke="${INK}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`
+      +`<circle cx="-6.8" cy="5.2" r="1.8" fill="#ef8a7a" opacity=".55"/><circle cx="6.8" cy="5.2" r="1.8" fill="#ef8a7a" opacity=".55"/>`;
   } else {
-    face=`<path d="M${-r},1 A${r} ${r} 0 0 1 ${r*.85},${-r*.5} Q${r*.2},${-r*.25} ${-r*.1},${-r*.15} Q${-r*.5},${r*.1} ${-r*.55},${r*.55} Q${-r*.9},${r*.55} ${-r},1Z" fill="${HAIR}"/>`
-      +`<ellipse cx="-2.6" cy="2" rx="1.8" ry="2.4" fill="${SKIN_D}"/>`
-      +`<ellipse cx="6" cy="0.4" rx="1.6" ry="2.1" fill="${INK}"/><circle cx="6.5" cy="-0.3" r=".6" fill="#fff"/><path d="M4 -3.6 Q6.4 -4.6 8.6 -3.6" fill="none" stroke="${INK}" stroke-width="1.4" stroke-linecap="round"/>`
-      +`<path d="M5.6 6 Q8.4 7.8 10.4 5.4" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/>`
-      +`<circle cx="8.4" cy="3.8" r="1.6" fill="#ef8a7a" opacity=".6"/>`;
+    o=`<circle cx="${r-.8}" cy="3.2" r="2.6" fill="${INK}"/><circle r="${r+1.1}" fill="${INK}"/>`
+      +`<circle r="${r}" fill="${SKIN}"/><circle cx="${r-.8}" cy="3.2" r="1.6" fill="${SKIN}"/>`;
+    face=`<path d="M${-r+.2},2.6 C${-r*1.12},${-r*1.15} ${r*.75},${-r*1.35} ${r*.98},${-r*.3} L${r*.7},-2.6 L${r*.5},-5 L${r*.3},-2.2 L${r*.05},-4.6 L${-r*.12},-1 Q${-r*.42},${r*.12} ${-r*.5},${r*.62} Q${-r*.86},${r*.66} ${-r+.2},2.6Z" fill="${HAIR}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`
+      +`<ellipse cx="-2.3" cy="2.4" rx="2.4" ry="3.1" fill="${SKIN}" stroke="${INK}" stroke-width="1.4"/><path d="M-2.6 1.2 Q-1.6 2.4 -2.6 3.6" fill="none" stroke="${SKIN_D}" stroke-width="1.2" stroke-linecap="round"/>`
+      +`<path d="M3.8 -2.4 Q6 -3.6 8.4 -2.6" fill="none" stroke="${HAIR}" stroke-width="1.5" stroke-linecap="round"/>`
+      +`<ellipse cx="6.1" cy="1" rx="1.6" ry="2.2" fill="${INK}"/><circle cx="6.6" cy=".2" r=".65" fill="#fff"/>`
+      +`<path d="M5.2 7 Q8 8.8 10.2 6.6" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/>`
+      +`<circle cx="8" cy="4.8" r="1.7" fill="#ef8a7a" opacity=".6"/>`;
   }
-  return `<g transform="translate(${f1(C[0])} ${f1(C[1])}) rotate(${f1(rot)})"><circle r="${r}" fill="${SKIN}" stroke="${INK}" stroke-width="2.2"/>${face}</g>`;
-}
-function torsoSVG(j,front){
-  const H=j.H,S=j.S,w=front?21:18;
-  return ln(H,S,INK,w+3.6)+ln(mix(H,S,-.05),S,'var(--red)',w)
-    +ln(mix(H,S,.08),mix(H,S,.22),'rgba(255,255,255,.28)',w*.62)
-    +ln(H,mix(H,S,.06),SHORTS,w)
-    +ln(S,j.N,INK,7.5)+ln(S,j.N,SKIN,4.5);
+  return `<g transform="translate(${f1(C[0])} ${f1(C[1])}) rotate(${f1(rot)})">${o}${face}</g>`;
 }
 function svgAt(id,ms,fi){
   const d=def(id);if(!d)return '';
@@ -185,9 +259,13 @@ function svgAt(id,ms,fi){
     +`<rect x="0" y="${G+3}" width="200" height="${150-G}" fill="#7cc86a"/><rect x="0" y="${G+3}" width="200" height="2.5" fill="#5aa84a"/>`;
   s+=`<ellipse cx="${f1(j.H[0])}" cy="${G+5}" rx="${f1(Math.max(10,26-air*.35))}" ry="3.4" fill="rgba(0,0,0,.22)"/>`;
   s+=propsSVG(d,j);
-  s+=legSVG(j,'1',!fr)+armSVG(j,'1',!fr);
-  s+=torsoSVG(j,fr)+headSVG(j,p,fr);
-  s+=legSVG(j,'2',false)+armSVG(j,'2',false);
+  if(fr){ /* facing you: both legs behind the body, both arms in front */
+    s+=legSVG(j,'1',false,fr)+legSVG(j,'2',false,fr)+torsoSVG(j,fr)+headSVG(j,p,fr)+armSVG(j,'1',false,fr)+armSVG(j,'2',false,fr);
+  } else { /* side on: far limbs shaded and behind, near limbs in front */
+    s+=legSVG(j,'1',true,fr)+armSVG(j,'1',true,fr);
+    s+=torsoSVG(j,fr)+headSVG(j,p,fr);
+    s+=legSVG(j,'2',false,fr)+armSVG(j,'2',false,fr);
+  }
   s+=propsFront(d,j);
   return s;
 }
@@ -205,5 +283,7 @@ function tick(now){
 }
 function start(){if(!raf)raf=requestAnimationFrame(tick);}
 function svg(id,cls,vb){if(!has(id))return '';start();return `<svg class="${cls||'demo'}" viewBox="${vb||'0 0 200 150'}" data-demo="${id}" role="img" aria-label="Animated demonstration">${svgAt(id,0)}</svg>`;}
-window.Demo={svg,has,svgAt,frames:id=>def(id).f.length,start,ids:()=>Object.keys(A)};
+/* thumbnail crop: 4:3, trimmed a little off each side but keeping heads, boots and the grass in view */
+const THUMB='10 8 180 135';
+window.Demo={THUMB,svg,has,svgAt,frames:id=>def(id).f.length,start,ids:()=>Object.keys(A)};
 })();
